@@ -4,6 +4,7 @@
 // node.js starter application for Bluemix
 //------------------------------------------------------------------------------
 
+var bodyParser = require('body-parser');
 
 // This application uses express as its web server
 // for more info, see: http://expressjs.com
@@ -18,13 +19,31 @@ var app = express();
 
 // serve the files out of ./public as our main files
 app.use(express.static(__dirname + '/public'));
+app.use(bodyParser.json());
+
 
 // get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
 
 
 
+// start server on the specified port and binding host
+app.listen(appEnv.port, '0.0.0.0', function() {
+  // print a message when the server starts listening
+  console.log("server starting on " + appEnv.url);
+});
+
+
+app.get('/mytest', function(req, res){
+	res.send("Test:");
+	res.end();
+});
+
+
+
 /* DATA ANALYSIS BY MOHAMMED */
+
+/*
 
 var bodyParser = require('body-parser');
 
@@ -37,13 +56,13 @@ var dbCredentials = {
     dbName: 'annotator-b'
 };
 
-var methodOverride = require('method-override');
+//var methodOverride = require('method-override');
 
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
-app.use(methodOverride());
+//app.use(methodOverride());
 
 
 function getDBCredentialsUrl(jsonData) {
@@ -63,7 +82,7 @@ function getDBCredentialsUrl(jsonData) {
 
 
 
-/*
+
 
 function initDBConnection() {
     //When running on Bluemix, this variable will be set to a json object
@@ -149,17 +168,6 @@ app.get('/readdocument', function () {
 /* END MOHAMMED */
 
 
-// start server on the specified port and binding host
-app.listen(appEnv.port, '0.0.0.0', function() {
-  // print a message when the server starts listening
-  console.log("server starting on " + appEnv.url);
-});
-
-
-app.get('/test', function(req, res){
-	res.send('test:' + process.env.ASSISTANT_USERNAME);
-	res.end();
-});
 
 
 

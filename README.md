@@ -1,6 +1,6 @@
-# Node.js Hello World Sample
+# Node.js Annotator Text Using Online Vocabularies
 
-This application demonstrates a simple, reusable Node.js web application based on the Express framework.
+Create RESTFul API, reusable Node.js web application based on the Express framework.
 
 ## Run the app locally
 
