@@ -127,11 +127,11 @@ req.on('error', function(e) {
   console.log('ERROR: ' + e.message);
 });
 */
-//app.listen(3000);
+app.listen(3000);
 
-//console.log("Express app running on port 3000");
+console.log("Express app running on port 3000");
 
-//module.exports = app;
+module.exports = app;
 // get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
 
