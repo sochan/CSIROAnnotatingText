@@ -1,6 +1,5 @@
 
 
-
 /*eslint-env node*/
 
 //------------------------------------------------------------------------------
@@ -31,20 +30,7 @@ var cors = require("cors");
 var bodyParser = require("body-parser");
 //var app = express();
 
-var skierTerms = [
-    {
-        term: "Rip",
-        defined: "To move at a high rate of speed"
-    },
-    {
-        term: "Huck",
-        defined: "To throw your body off of something, usually a natural feature like a cliff"
-    },
-    {
-        term: "Chowder",
-        defined: "Powder after it has been sufficiently skied"
-    }
-];
+
 var printTerms=[{}];
 var autoSearch=[{}];
 const MongoClient = require('mongodb').MongoClient;
@@ -175,10 +161,10 @@ req.on('error', function(e) {
 //module.exports = app;
 
 
-app.set('port',process.env.PORT);
+//app.set('port',process.env.PORT);
 
 // start server on the specified port and binding host
-app.listen(appEnv.port, '0.0.0.0', function() {
+app.listen(process.env.PORT, '0.0.0.0', function() {
   // print a message when the server starts listening
   console.log("server starting on " + appEnv.url);
 });
