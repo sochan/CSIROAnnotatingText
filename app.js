@@ -19,18 +19,18 @@ var app = express();
 
 var printTerms=[{}];
 var autoSearch=[{}];
-const MongoClient = require('mongodb').MongoClient;
-const uri = "mongodb://admin:admin123456@cluster0-shard-00-00-cmwhk.mongodb.net:27017,cluster0-shard-00-01-cmwhk.mongodb.net:27017,cluster0-shard-00-02-cmwhk.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true";
-const client = new MongoClient(uri, { useNewUrlParser: true });
-client.connect(err => {
-  const collection = client.db("test").collection("dictionary").findOne({}, function(err, res) {
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://admin:admin123456@cluster0-shard-00-00-cmwhk.mongodb.net:27017,cluster0-shard-00-01-cmwhk.mongodb.net:27017,cluster0-shard-00-02-cmwhk.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true";
+
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("annotator");
+ // var myobj = { name: "Thinesh", password:"thinesh1234",address: "Highway 37" };
+  dbo.collection("dictionary").findOne({}, function(err, result) {
     if (err) throw err;
-    console.log("Result is "+ res.term);
-   client.close();
+    console.log(result.name);
+    db.close();
   });
- // perform actions on the collection object
-  //client.close();
-  //console.log('Connected to MongoDB');
 });
 // serve the files out of ./public as our main files
 app.use(express.static(__dirname + '/public'));
