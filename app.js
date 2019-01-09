@@ -63,7 +63,8 @@ app.use(function(req, res, next) {
 });
 
 //app.use(express.static("./public"));
-
+// serve the files out of ./public as our main files
+app.use(express.static(__dirname + '/public'));
 app.use(cors());
 
 app.get("/dictionary-get-api", function(req, res) {
@@ -118,8 +119,7 @@ app.delete("/dictionary-api/:term", function(req, res) {
 
 //module.exports = app;
 
-// serve the files out of ./public as our main files
-app.use(express.static(__dirname + '/public'));
+
 
 // get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
