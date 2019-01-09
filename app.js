@@ -66,7 +66,7 @@ app.use(function(req, res, next) {
 
 app.use(cors());
 
-app.get("/dictionary-api", function(req, res) {
+app.get("/dictionary-get-api", function(req, res) {
 	//res.json(skierTerms);
 	//console.log(req.body);
 	const client = new MongoClient(uri, { useNewUrlParser: true });
@@ -74,7 +74,7 @@ app.get("/dictionary-api", function(req, res) {
 	const collection = client.db("test").collection("dictionary").find({}).toArray(function(err, result) {
     if (err) throw err;
     //console.log(result);
-	autoSearch.push(result);
+	printTerms.push(result);
 	res.json(result);
    client.close();
   });
@@ -97,19 +97,11 @@ app.post("/dictionary-api", function(req, res) {
     console.log("1 vocabulary inserted");
 	//autoSearch.push(req.body);
 	//res.json(printTerms);
+	res.redirect('/dictionary-get-api');
    client.close();
   });
 });
-	client.connect(err => {
-	const collection = client.db("test").collection("dictionary").find({}).toArray(function(err, result) {
-    if (err) throw err;
-    console.log(result);
-	printTerms.push(result);
-	res.json(result);
-	console.log(req.body);
-   client.close();
-});
-});
+	
 });
 
 app.delete("/dictionary-api/:term", function(req, res) {
