@@ -19,7 +19,7 @@ function printTerms(terms) {
 		if(this.term!=undefined){
 		termStrings.push(this.term);
 		}
-		alert(this.term);
+	//	alert(this.term);
         $('<dd>').text(this.defined).appendTo('body>dl');
 		
     });
