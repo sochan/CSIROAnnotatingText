@@ -1,7 +1,6 @@
 
 
 
-
 /*eslint-env node*/
 
 //------------------------------------------------------------------------------
@@ -176,7 +175,7 @@ req.on('error', function(e) {
 //module.exports = app;
 
 
-
+app.set('port',process.env.PORT);
 
 // start server on the specified port and binding host
 app.listen(appEnv.port, '0.0.0.0', function() {
