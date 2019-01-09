@@ -132,6 +132,8 @@ req.on('error', function(e) {
 //console.log("Express app running on port 3000");
 
 //module.exports = app;
+
+var cfenv = require('cfenv');
 // get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
 
