@@ -157,7 +157,9 @@ req.on('error', function(e) {
 //module.exports = app;
 
 // start server on the specified port and binding host
-app.listen(appEnv.port, '0.0.0.0', function() {
+//app.listen(appEnv.port, '0.0.0.0', function() {
   // print a message when the server starts listening
-  console.log("server starting on " + appEnv.url);
-});
+ // console.log("server starting on " + appEnv.url);
+//});
+var server = app.listen(app.get('port'), function()
+  {console.log('Listening on port %d', server.address().port);});
