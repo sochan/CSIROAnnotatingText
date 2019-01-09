@@ -132,6 +132,23 @@ req.on('error', function(e) {
 //console.log("Express app running on port 3000");
 
 //module.exports = app;
+var bodyParser = require('body-parser');
+
+// This application uses express as its web server
+// for more info, see: http://expressjs.com
+var express = require('express');
+
+// cfenv provides access to your Cloud Foundry environment
+// for more info, see: https://www.npmjs.com/package/cfenv
+var cfenv = require('cfenv');
+
+// create a new express server
+var app = express();
+
+// serve the files out of ./public as our main files
+app.use(express.static(__dirname + '/public'));
+app.use(bodyParser.json());
+
 
 var cfenv = require('cfenv');
 // get the app environment from Cloud Foundry
