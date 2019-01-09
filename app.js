@@ -1,5 +1,4 @@
 
-
 /*eslint-env node*/
 
 //------------------------------------------------------------------------------
@@ -154,17 +153,17 @@ req.on('error', function(e) {
   console.log('ERROR: ' + e.message);
 });
 */
-//app.listen(3000);
+app.listen(appEnv.port);
 
 //console.log("Express app running on port 3000");
 
-//module.exports = app;
+module.exports = app;
 
 
 //app.set('port',process.env.PORT);
 
 // start server on the specified port and binding host
-app.listen(process.env.PORT, '0.0.0.0', function() {
+//app.listen(process.env.PORT, '0.0.0.0', function() {
   // print a message when the server starts listening
-  console.log("server starting on " + appEnv.url);
-});
+  //console.log("server starting on " + appEnv.url);
+//});
