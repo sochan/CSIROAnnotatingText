@@ -1,4 +1,4 @@
-# Node.js Hello World Sample
+# Node.js Annotating text using online vocabularies
 
 This application demonstrates a simple, reusable Node.js web application based on the Express framework.
 
