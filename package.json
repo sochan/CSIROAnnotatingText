@@ -9,11 +9,13 @@
 		"express": "4.15.x",
 		"cfenv": "1.0.x",
 		"body-parser": "^1.18.3",
-    "cors": "^2.7.1",
-    "mongodb": "^3.1.10"
+		"cors": "^2.7.1",
+		"express-session": "latest",
+		"connect-cloudant-store": "latest",
+		"cloudant": "latest"
 	},
 	"repository": {},
 	"engines": {
 		"node": "6.x"
-	} 
+	}
 }
