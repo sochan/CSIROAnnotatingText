@@ -105,8 +105,8 @@
 			<table class="table-bordered" style="width: 100%">
 				<colgroup><col width="50%">
 				</colgroup><tbody><tr class="active">
-					<th class="th1">Selected Definition</th>
-					<th class="th1">Results <label id="resultnb"></label></th>
+					<th class="th1">Selected Definitions</th>
+					<th class="th1">Found definitions <label id="resultnb"></label></th>
 				</tr>
 				<tr>
 					<td style="vertical-align: top; padding: 5px;" id="td_selected"></td>
@@ -146,7 +146,7 @@
 				$("#div_loading").hide();
 
 				result = dic; // set to global
-				$("#resultnb").val("(" +result.length+ ")");
+				$("#resultnb").html("(" +result.length+ ")");
 				$("#td_results").show().html(formHtmlSelect(result));
 			});
 		});

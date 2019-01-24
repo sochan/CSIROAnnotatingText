@@ -4,6 +4,7 @@
 // node.js starter application for Bluemix
 //------------------------------------------------------------------------------
 
+/*eslint-disable no-param-reassign */
 var bodyParser = require('body-parser');
 
 // This application uses express as its web server
