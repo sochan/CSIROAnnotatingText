@@ -232,7 +232,7 @@ function isExisted(documents, callback){
 function isExistedResponse(documents){
     
     var result = isExisted(documents, function (data) {
-        if (data["docs"].length == 0) // not exist then insert
+        if (data["docs"].length === 0) // not exist then insert
         {
             documents.forEach(doc => {
                 createDocument(doc, function(data){
@@ -260,7 +260,7 @@ function grabUrl(url) {
     var result;
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
+      if (this.readyState === 4 && this.status === 200) {
         result = JSON.parse(this.responseText);
       }
     };
@@ -289,7 +289,7 @@ function getDefFromAdaptors(searchword){
         var resUrl = grabUrl(adaptors[i] + searchword);
         if (resUrl.length > 0) //
         {
-            if (resUrl[0].definition != "")
+            if (resUrl[0].definition !== "")
             {
                // isExistedResponse(resUrl);// insert list into Cached if not yet
                 resultFromAdaptor.push.apply(resultFromAdaptor, resUrl);
@@ -304,25 +304,6 @@ function getDefFromAdaptors(searchword){
  * End Data Analysis
  */
 
-/*
- * Testing
- */
-
-app.get('/api/core/test1', function(req, res){
-
-	//res.setHeader('Content-Type', 'application/json');
-	
-	
-	var wrd = getDefDictionary1("food");
-	
-	
-	//res.send(wrd);
-	if (wrd !== "")
-		res.send("Definition: " + wrd.definition);
-	else res.send("Not found");
-	//res.send("Test:" + getDBCredentialsUrl(process.env.VCAP_SERVICES));
-	res.end();
-});
 /**
  * correct searched word input for example 'fooD' to 'Food'
  * @param {string} searchWord 
@@ -362,7 +343,7 @@ app.get('/api/core/test3', function(req, res){
 
     res.send(upper);
     res.end();
-})
+});
 
 
 app.get('/api/core/test4', function(req, res){
