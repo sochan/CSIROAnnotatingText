@@ -7,6 +7,7 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="js/utils.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/style.css" media="all">
 
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -105,7 +106,7 @@
 				<colgroup><col width="50%">
 				</colgroup><tbody><tr class="active">
 					<th class="th1">Selected Definition</th>
-					<th class="th1">Results</th>
+					<th class="th1">Results <label id="resultnb"></label></th>
 				</tr>
 				<tr>
 					<td style="vertical-align: top; padding: 5px;" id="td_selected"></td>
@@ -123,47 +124,7 @@
 
 <script>
 
-
-	function selectOneDefinition(docId) {
-			var searchword = $("#searchword").val();
-			$("#div_loading").show();
-			$("#td_selected").show().html("");
-
-
-			var oldselectedId = $("#selected_id").val();
-			if (oldselectedId != "") {
-				// get old selected Id
-				$.get("/api/core/getdocbyid/?_id=" + oldselectedId, function (res2) {
-					var oldselectedDocument = res2;
-					oldselectedDocument.selected = "0";
-					$.post("/api/core/updateword/", oldselectedDocument, function (result) {
-
-					});
-				});
-			}
-
-			// get new selected doc
-			$.get("/api/core/getdocbyid/?_id=" + docId, function (res1) {
-				var newselecteddocument = res1;
-				newselecteddocument.selected = "1";
-				// update new selected document
-				$.post("/api/core/updateword/", newselecteddocument, function (result) {
-					$("#selected_id").val(docId);
-
-					$("#div_loading").hide();
-					$.get("/api/core/getdocbyid/?_id="  + docId, function (data) {
-						//console.log(data);
-						//$("#td_selected").show().html();
-						$("#div_loading").hide();
-						$("#td_selected").show().html(data.definition + "<br><br>" + "Source: <a href='" + data.link + "'>" + data.dict + "</a>");
-					});
-				});
-			});
-		}
-
-
 	$(document).ready(function() {
-		
 		/*eslint-env jquery */
 		$( "#btngo" ).click(function() {
 			//alert("click");
@@ -173,50 +134,22 @@
 			$("#td_results").show().html("");
 			var searchword = $("#searchword").val();
 
-			/* Get selected DB from CachedDB */
-
-			/* Get definitions from Cached DB */
-			$("#td_selected").show().html("");
-
-
-			$.post("/api/core/connectOnlineDict", { "searchword": searchword }, function (dic) {
-				$.get("/api/core/readselectedword?searchword=" + searchword, function (data) {
-
-					$("#div_result").show();
-					$("#div_loading").hide();
-					if (data.length > 0) {
-						$("#selected_id").val(data[0]._id);
-						$("#td_selected").show().html(data[0].definition + "<br><br>" + "Source: <a href='" + data[0].link + "'>" + data[0].dict + "</a>");
-					}
-				});
+			$.get("/api/core/readdocument?searchword=" + searchword, function (data) {
+				/* Get definitions from Cached DB */
+				$("#td_selected").show().html("");
+				resultDb = data; // from DB
+				$("#td_selected").show().html(formHtmlDelete(resultDb));
 			});
 
-			
+			$.post("/api/core/connectonlinedictionary", { "searchword": searchword }, function (dic) {
+				$("#div_result").show();
+				$("#div_loading").hide();
 
-			/* Get definitions from Cached DB */
-			$.get("/api/core/searchword?searchword=" + searchword, function (data) {
-			
-				$("#td_results").show().html(formHtml(data));
-			
+				result = dic; // set to global
+				$("#resultnb").val("(" +result.length+ ")");
+				$("#td_results").show().html(formHtmlSelect(result));
 			});
-
 		});
-
-		function formHtml(data){
-			var strResult = "<table class=\"table\"><tbody>";
-			var i = 0;
-			
-			data.forEach(word => {
-				i++;
-				strResult += "<tr><td>" + i + ") " + word.definition + "<br> Source: <a href='"+ word.link +"'>" + word.dict + "</a>"  + "</td><td><button onclick=\"javascript:selectOneDefinition('"+word._id+"');\" style=\"float: right;\">Select</button></td></tr>";
-			});
-			
-			strResult += "</tbody></table>"
-
-
-			return strResult;
-
-		}
     });
 	
 </script>

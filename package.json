@@ -12,7 +12,8 @@
 		"cors": "^2.7.1",
 		"express-session": "latest",
 		"connect-cloudant-store": "latest",
-		"cloudant": "latest"
+		"cloudant": "latest",
+		"xmlhttprequest": "latest"
 	},
 	"repository": {},
 	"engines": {

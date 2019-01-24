@@ -103,7 +103,6 @@ function readAllDocuemnts(callback) {
     db.list({include_docs: true}, function (err, data) {
        var josn_data = JSON.stringify(data);
        var documents = [];
-        //console.log(data.total_rows);
         for (var i = 0; i < data.total_rows; i++) {
             documents [i] = data.rows[i];
         }
@@ -111,24 +110,6 @@ function readAllDocuemnts(callback) {
     });
     return null;
 }
-
-// create a document
-function createDocument(document, callback) {
-    //var nextDocID = parseInt(getNumDocuments()) + 1;
-    //console.log('Doc_2#' + nextDocID);
-    var label = document.label;
-    var definition = document.definition;
-    var dict =  document.dictionary;
-    var sel = "0";
-    var link = document.link;
-
-    db.insert({label: label, definition: definition, dict: dict, selected : sel, link : link}, function (err, data) {
-        //console.log('Error:', err);
-        //console.log('Data:', data);
-        callback(data);
-    });
-}
-
 // Read All Documents
 app.get('/api/core/allwords', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
@@ -140,35 +121,44 @@ app.get('/api/core/allwords', function (req, res) {
 
 });
 
-app.get('/api/core/addword', function (req, res) {
-
-    var sampleDoc = '{"label": "label", "definition": "definition", "dict": "dict", "link":""}';
-
-    
-    sampleDoc = JSON.parse(sampleDoc);
-    createDocument(sampleDoc, function(data) {
-        res.setHeader('Content-Type', 'application/json');
-        res.send(data);
-        res.end();
-    });
-
-});
-
-// read/search word, seleted
-function readDocument(word, callback) {
-    var searchWord = word.toLowerCase();//correctSearchWord(word);
-    var query = {selector: {label: searchWord}};
-    console.log(searchWord);
-    db.find(query, function (err, data) {
-        //console.log('Error:', err);
-        //console.log('Data:', data);
+// create a document
+/**
+ * It is used to insert new
+ * @param {document} document
+ * @param {*} callback 
+ */
+function createDocument(document, callback) {
+    db.insert({
+        "label": document.label,
+        "definition": document.definition,
+        "dictionary": document.dictionary,
+        "deleted": document.deleted,
+        "link": document.link
+    }, function (err, data) {
         callback(data);
     });
 }
 
-app.get('/api/core/readword', function (req, res) {
+app.post('/api/core/adddocument/', function (req, res) {
+    var document = req.body;
+    createDocument(document, function(data) {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(data);
+        res.end();
+    });
+});
+
+// read/search word, seleted, not deleted
+function readDocument(word, callback) {
+    var searchWord = word.toLowerCase();//correctSearchWord(word);
+    var query = {selector: {label: searchWord, deleted:"0"}};
+    db.find(query, function (err, data) {
+        callback(data);
+    });
+}
+
+app.get('/api/core/readdocument', function (req, res) {
     var result = readDocument(req.query.searchword, function (data) { //req.body.searchword
-            //console.log(data);
             res.setHeader('Content-Type', 'application/json');
             res.send(data["docs"]);
             res.end();
@@ -177,76 +167,35 @@ app.get('/api/core/readword', function (req, res) {
 });
 
 
-app.post('/api/core/connectOnlineDict', function(req, res){
+app.post('/api/core/connectonlinedictionary', function(req, res){
     var getOnlineDictionaries = getDefFromAdaptors(req.body.searchword);
     res.send(getOnlineDictionaries);
     res.end();
 });
 
-app.get('/api/core/searchword', function (req, res) {
-    //var getOnlineDictionaries = getDefFromAdaptors(req.query.searchword);
-    var result = readDocument(req.query.searchword, function (data) { //req.body.searchword
-        //console.log(data);
-        res.setHeader('Content-Type', 'application/json');
-        res.send(data["docs"]);
-        res.end();
-    });
-});
-
-
-
-
-//
-function readSelectedDocument(word, callback) {
-    var searchWord = word.toLowerCase();
-    var query = {selector: {label: searchWord, selected:"1"}};
-    db.find(query, function (err, data) {
-        //console.log('Error:', err);
-        //console.log('Data:', data);
-        callback(data);
-    });
-}
-
 function readDocumentById(docId, callback) {
-    var query = {selector: {_id: docId}};
+    var query = {selector: {_id: docId, deleted: "0"}};
     db.find(query, function (err, data) {
-        //console.log('Error:', err);
-        //console.log('Data:', data);
         callback(data);
     });
 }
 
-
-app.get('/api/core/getdocbyid', function(req,res){
+app.get('/api/core/getdocumentbyid', function (req, res) {
     var result = readDocumentById(req.query._id, function (data) { //req.body.searchword
-        //console.log(data);
         res.setHeader('Content-Type', 'application/json');
         res.send(data["docs"][0]);
         res.end();
-    }
-);
-})
-
-app.get('/api/core/readselectedword', function (req, res) {
-    var result = readSelectedDocument(req.query.searchword, function (data) { //req.body.searchword
-            //console.log(data);
-            res.setHeader('Content-Type', 'application/json');
-            res.send(data["docs"]);
-            res.end();
-        }
-    );
+    });
 });
 
 function updateDocument(document, callback) {
-     db.insert({"_id":document._id, "_rev": document._rev, "label": document.label, "definition": document.definition, "dict": document.dict,"link":document.link, "selected" : document.selected}, function (err, data) {
-        //console.log('Error:', err);
-        //console.log('Data:', data);
+     db.insert({"_id":document._id, "_rev": document._rev, "label": document.label, "definition": document.definition, "dictionary": document.dictionary,"link":document.link, "deleted" : document.deleted}, function (err, data) {
         callback(data);
     });
 
 }
 
-app.post('/api/core/updateword', function (req, res) {
+app.post('/api/core/updatedocument', function (req, res) {
     var document = req.body;
     var result = updateDocument(document, function(data)
         {
@@ -270,7 +219,6 @@ app.post('/api/core/updateword', function (req, res) {
  */
 function isExisted(documents, callback){
     var document = documents[0];
-    var nbrow = 0;
     var query = { selector: { label: document.label, link: document.link}};
     db.find(query, function(err, data){
         callback(data);
@@ -284,7 +232,6 @@ function isExisted(documents, callback){
 function isExistedResponse(documents){
     
     var result = isExisted(documents, function (data) {
-        //console.log(data);
         if (data["docs"].length == 0) // not exist then insert
         {
             documents.forEach(doc => {
@@ -295,8 +242,6 @@ function isExistedResponse(documents){
         }
     });
 }
-
-// update selected
 
 /*
  *  End Core
@@ -317,7 +262,6 @@ function grabUrl(url) {
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         result = JSON.parse(this.responseText);
-        // console.log(result);
       }
     };
     xhttp.open("GET", url, false);
@@ -340,7 +284,6 @@ var adaptors = [
 function getDefFromAdaptors(searchword){
     searchword = searchword.toLowerCase();
     var resultFromAdaptor =[];
-    //console.log("searched word: " + searchword)
     for (var i=0; i < adaptors.length; i++)
     {
         var resUrl = grabUrl(adaptors[i] + searchword);
@@ -348,7 +291,7 @@ function getDefFromAdaptors(searchword){
         {
             if (resUrl[0].definition != "")
             {
-                isExistedResponse(resUrl);// insert list into Cached if not yet
+               // isExistedResponse(resUrl);// insert list into Cached if not yet
                 resultFromAdaptor.push.apply(resultFromAdaptor, resUrl);
             }
                 
@@ -431,16 +374,6 @@ app.get('/api/core/test4', function(req, res){
     
 
 });
-
-app.get('/api/core/test5', function(req, res){
-    var doc = {
-        label : 'oxygen',
-        link: 'http://environment.data.gov.au/def/object/oxygen',
-        dict: ''
-    }
-});
-
-
 
 /*
  * End Testing
