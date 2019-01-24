@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html>
-<head>
+<html><head>
 	<title>ANNOTATOR</title>
 
 	<link rel="stylesheet" href="css/bootstrap.min.css">
@@ -8,8 +7,34 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="css/style.css" media="all" />
+	<link rel="stylesheet" type="text/css" href="css/style.css" media="all">
 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+	.loader {
+		position: absolute;
+	  border: 16px solid #f3f3f3;
+	  border-radius: 50%;
+	  border-top: 16px solid #3498db;
+	  width: 120px;
+	  height: 120px;
+	  top: 50%;
+  	  left: 45%;
+	  -webkit-animation: spin 2s linear infinite; /* Safari */
+	  animation: spin 2s linear infinite;
+	}
+	
+	/* Safari */
+	@-webkit-keyframes spin {
+	  0% { -webkit-transform: rotate(0deg); }
+	  100% { -webkit-transform: rotate(360deg); }
+	}
+	
+	@keyframes spin {
+	  0% { transform: rotate(0deg); }
+	  100% { transform: rotate(360deg); }
+	}
+	</style>
 </head>
 <body>
 
@@ -22,7 +47,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>                        
       </button>
-      <a class="navbar-brand" href="#">ANNOTATOR</a>
+      <a class="navbar-brand" href="#">Annotator</a>
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
     <ul class="nav navbar-nav navbar-right">
@@ -41,7 +66,7 @@
 		<div class="col-md-1"></div>
 		<div class="col-md-10">
 			<table class="table table-bordered">
-				<tr class="active">
+				<tbody><tr class="active">
 					<th>
 						Search
 					</th>
@@ -50,121 +75,151 @@
 					<td>
 						<div class="row">
 							<div class="col-md-10">
-								<div class="search-bar"><input type="text" class=" text1" placeholder="Enter a Class"></div>
+								<div class="search-bar"><input type="text" class=" text1" id="searchword" placeholder="Enter a Word"></div>
 							</div>
 							<div class="col-md-2">
-								<div style="padding-top: 10px; padding-right: 10px;"><button class="button1">GO</button></div>
+								<div style="padding-top: 10px; padding-right: 10px;"><button class="button1" id="btngo">GO</button></div>
 							</div>
 						</div>
 						
 					</td>
 				</tr>
-			</table>
+			</tbody></table>
 		</div>
 	</div>
 </div>
 <br>
-
-<div class="container">
+<div id="div_loading" style="display:none;" class="container">
+	<div class="row" style="text-align:center;">
+			
+				<div class="loader"></div>
+		
+	</div>
+</div>
+<div class="container" id="div_result">
 	<div class="row">
 		<div class="col-md-1"></div>
 
 		<div class="col-md-10">
 			<table class="table-bordered" style="width: 100%">
-				<col width="50%">
-				<tr class="active">
-					<th class="th1">Selected Definitions</th>
+				<colgroup><col width="50%">
+				</colgroup><tbody><tr class="active">
+					<th class="th1">Selected Definition</th>
 					<th class="th1">Results</th>
 				</tr>
 				<tr>
-					<td></td>
-					<td>
-						<table class="table">
-							<tr>
-								<td>
-									1) Definition 1
-								</td>
-								<td>
-									<button style="float: right;">
-										Select
-									</button>
+					<td style="vertical-align: top; padding: 5px;" id="td_selected"></td>
+					<td id="td_results">
 
-								</td>
-							</tr>
-							<tr>
-								<td>
-									2) Definition 2
-								</td>
-								<td>
-									<button style="float: right;">
-										Select
-									</button>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									3) Definition 3
-								</td>
-								<td>
-									<button style="float: right;">
-										Select
-									</button>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									4) Definition 4
-								</td>
-								<td>
-									<button style="float: right;">
-										Select
-									</button>
-								</td>
-							</tr>
-						</table>
 					</td>
 				</tr>
-			</table>
+			</tbody></table>
 		</div>
+		<input type="hidden" id="selected_id">
 
 	</div>
 </div>
-<!-- <div class="row">
-	<div class="col-md-1"></div>
-	<div class="col-md-8">
-		
-		<input type="checkbox"> Exclude Synonyms &emsp; 
-		<input type="checkbox"> Co-ordinate longest only &emsp; 
-		<input type="checkbox"> co-ordinate partial words &emsp; 
-		<input type="checkbox"> include mapping &emsp; 
-		<input type="checkbox"> Exclude Numbers &emsp;  
-		<br>
-		<br>
-		<div class="text-style">Browse Ontologies </div>
-		<input type="file" name="">
-	</div>
-	<div class="col-md-2">
-		<button style="width: 80px">GO</button>
-		<br><br><br><br><br><br>
-		<table class="table table-bordered">
-			<tr>
-				<th><center>History</center></th>
-			</tr>
-			<tr><td>1</td></tr>
-			<tr><td>2</td></tr>
-			<tr><td>3</td></tr>
-			<tr><td>4</td></tr>
-			<tr><td>5</td></tr>
-		</table>
-	</div>
-</div>
 
-<div class="row">
-	<div class="col-md-9"></div>
-	<div class="col-md-2">
+
+<script>
+
+
+	function selectOneDefinition(docId) {
+			var searchword = $("#searchword").val();
+			$("#div_loading").show();
+			$("#td_selected").show().html("");
+
+
+			var oldselectedId = $("#selected_id").val();
+			if (oldselectedId != "") {
+				// get old selected Id
+				$.get("/api/core/getdocbyid/?_id=" + oldselectedId, function (res2) {
+					var oldselectedDocument = res2;
+					oldselectedDocument.selected = "0";
+					$.post("/api/core/updateword/", oldselectedDocument, function (result) {
+
+					});
+				});
+			}
+
+			// get new selected doc
+			$.get("/api/core/getdocbyid/?_id=" + docId, function (res1) {
+				var newselecteddocument = res1;
+				newselecteddocument.selected = "1";
+				// update new selected document
+				$.post("/api/core/updateword/", newselecteddocument, function (result) {
+					$("#selected_id").val(docId);
+
+					$("#div_loading").hide();
+					$.get("/api/core/getdocbyid/?_id="  + docId, function (data) {
+						//console.log(data);
+						//$("#td_selected").show().html();
+						$("#div_loading").hide();
+						$("#td_selected").show().html(data.definition + "<br><br>" + "Source: <a href='" + data.link + "'>" + data.dict + "</a>");
+					});
+				});
+			});
+		}
+
+
+	$(document).ready(function() {
 		
-	</div> -->
+		/*eslint-env jquery */
+		$( "#btngo" ).click(function() {
+			//alert("click");
+			$("#div_loading").show();
+			$("#div_result").hide();
+			$("#td_selected").show().html("");
+			$("#td_results").show().html("");
+			var searchword = $("#searchword").val();
+
+			/* Get selected DB from CachedDB */
+
+			/* Get definitions from Cached DB */
+			$("#td_selected").show().html("");
+
+
+			$.post("/api/core/connectOnlineDict", { "searchword": searchword }, function (dic) {
+				$.get("/api/core/readselectedword?searchword=" + searchword, function (data) {
+
+					$("#div_result").show();
+					$("#div_loading").hide();
+					if (data.length > 0) {
+						$("#selected_id").val(data[0]._id);
+						$("#td_selected").show().html(data[0].definition + "<br><br>" + "Source: <a href='" + data[0].link + "'>" + data[0].dict + "</a>");
+					}
+				});
+			});
+
+			
+
+			/* Get definitions from Cached DB */
+			$.get("/api/core/searchword?searchword=" + searchword, function (data) {
+			
+				$("#td_results").show().html(formHtml(data));
+			
+			});
+
+		});
+
+		function formHtml(data){
+			var strResult = "<table class=\"table\"><tbody>";
+			var i = 0;
+			
+			data.forEach(word => {
+				i++;
+				strResult += "<tr><td>" + i + ") " + word.definition + "<br> Source: <a href='"+ word.link +"'>" + word.dict + "</a>"  + "</td><td><button onclick=\"javascript:selectOneDefinition('"+word._id+"');\" style=\"float: right;\">Select</button></td></tr>";
+			});
+			
+			strResult += "</tbody></table>"
+
+
+			return strResult;
+
+		}
+    });
 	
-</div>
-</body>
-</html>
+</script>
+
+
+</body></html>
