@@ -6,7 +6,8 @@
 	<link rel="stylesheet" href="css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <script src="js/utils.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/style.css" media="all">
 
@@ -90,10 +91,22 @@
 	</div>
 </div>
 <br>
+<div id="div_err" style="display:none;"  class="container">
+	<div class="row">
+		<div class="col-md-1"></div>
+		<div class="col-md-10" style="text-align:center;">
+			<label id="error_msg" style="color:red;"></label>
+		</div>
+	</div>
+</div>
+
 <div id="div_loading" style="display:none;" class="container">
 	<div class="row" style="text-align:center;">
 			
 				<div class="loader"></div>
+				<div>
+					<label id="error_msg" style="color:red;"></label>
+				</div>
 		
 	</div>
 </div>
@@ -106,7 +119,7 @@
 				<colgroup><col width="50%">
 				</colgroup><tbody><tr class="active">
 					<th class="th1">Selected Definitions</th>
-					<th class="th1">Found definitions <label id="resultnb"></label></th>
+					<th class="th1">Results <label id="resultnb"></label></th>
 				</tr>
 				<tr>
 					<td style="vertical-align: top; padding: 5px;" id="td_selected"></td>
@@ -125,9 +138,22 @@
 <script>
 
 	$(document).ready(function() {
+
+
+		// load label for Autocomplete;
+		$.get("/api/core/alllabels", function (data) {
+			console.log(data);
+			$( "#searchword" ).autocomplete({
+				source: data
+			});
+		});
+
+
+
 		/*eslint-env jquery */
 		$( "#btngo" ).click(function() {
 			//alert("click");
+			$("#div_err").hide();
 			$("#div_loading").show();
 			$("#div_result").hide();
 			$("#td_selected").show().html("");
@@ -144,10 +170,17 @@
 			$.post("/api/core/connectonlinedictionary", { "searchword": searchword }, function (dic) {
 				$("#div_result").show();
 				$("#div_loading").hide();
-
-				result = dic; // set to global
-				$("#resultnb").html("(" +result.length+ ")");
-				$("#td_results").show().html(formHtmlSelect(result));
+				// alert(dic.error);
+				if (dic.error != "")
+				{
+					$("#div_err").show();
+					$("#error_msg").html(dic.error);
+				}else{
+					result = dic.definitions; // set to global
+					$("#resultnb").html("(" +result.length+ ")");
+					$("#td_results").show().html(formHtmlSelect(result));
+				}
+			
 			});
 		});
     });

@@ -1,10 +1,13 @@
 /*eslint-env node*/
 
+// Call other components
+
+var analysis = require('./components/dataanalysis');
+
 //------------------------------------------------------------------------------
 // node.js starter application for Bluemix
 //------------------------------------------------------------------------------
 
-/*eslint-disable no-param-reassign */
 var bodyParser = require('body-parser');
 
 // This application uses express as its web server
@@ -122,6 +125,35 @@ app.get('/api/core/allwords', function (req, res) {
 
 });
 
+function readAllLabels(callback) {
+    db.list({include_docs: true}, function (err, data) {
+       var josn_data = JSON.stringify(data);
+       var labels = [];
+
+       data.rows.forEach(element => {
+            var lbl = element.doc.label;
+            console.log(lbl);
+            if (labels.indexOf(lbl) == -1) // not exist
+                labels.push(lbl)
+         });
+        callback(labels);
+    });
+    return null;
+}
+// Read All Documents
+app.get('/api/core/alllabels', function (req, res) {
+    res.setHeader('Content-Type', 'application/json');
+    readAllLabels(function(data)
+    {
+        res.send(data);
+        res.end();
+    });
+
+});
+
+
+
+
 // create a document
 /**
  * It is used to insert new
@@ -149,6 +181,10 @@ app.post('/api/core/adddocument/', function (req, res) {
     });
 });
 
+function readLabels(callback){
+
+}
+
 // read/search word, seleted, not deleted
 function readDocument(word, callback) {
     var searchWord = word.toLowerCase();//correctSearchWord(word);
@@ -169,7 +205,7 @@ app.get('/api/core/readdocument', function (req, res) {
 
 
 app.post('/api/core/connectonlinedictionary', function(req, res){
-    var getOnlineDictionaries = getDefFromAdaptors(req.body.searchword);
+    var getOnlineDictionaries = analysis.getDefFromAdaptors(req.body.searchword);
     res.send(getOnlineDictionaries);
     res.end();
 });
@@ -233,7 +269,7 @@ function isExisted(documents, callback){
 function isExistedResponse(documents){
     
     var result = isExisted(documents, function (data) {
-        if (data["docs"].length === 0) // not exist then insert
+        if (data["docs"].length == 0) // not exist then insert
         {
             documents.forEach(doc => {
                 createDocument(doc, function(data){
@@ -248,63 +284,27 @@ function isExistedResponse(documents){
  *  End Core
  */
 
-/*
- * Data Analysis
- */
 
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-/**
- * XMLHttRequest from W3School
- * @param {*} url 
- */
-function grabUrl(url) {
-    var result;
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState === 4 && this.status === 200) {
-        result = JSON.parse(this.responseText);
-      }
-    };
-    xhttp.open("GET", url, false);
-    xhttp.send();
-
-    return result;
-  }
-// update adaptors' API here
-var adaptors = [
-    "https://annotatingtext.appspot.com/api/adaptor/dictionary1/?term=",
-    "https://annotatingtext.appspot.com/api/adaptor/dictionary2/?term=",
-    "https://annotatingtext.appspot.com/api/adaptor/dictionary3/?term=",
-    "https://annotatingtext.appspot.com/api/adaptor/dictionary4/?term="
-];
-
-/**
- * Get definitions from Adaptors
- * @param {string} searchword 
- */
-function getDefFromAdaptors(searchword){
-    searchword = searchword.toLowerCase();
-    var resultFromAdaptor =[];
-    for (var i=0; i < adaptors.length; i++)
-    {
-        var resUrl = grabUrl(adaptors[i] + searchword);
-        if (resUrl.length > 0) //
-        {
-            if (resUrl[0].definition !== "")
-            {
-               // isExistedResponse(resUrl);// insert list into Cached if not yet
-                resultFromAdaptor.push.apply(resultFromAdaptor, resUrl);
-            }
-                
-        }  
-    }
-	return resultFromAdaptor;
-}
 
 /*
- * End Data Analysis
+ * Testing
  */
 
+app.get('/api/core/test1', function(req, res){
+
+	//res.setHeader('Content-Type', 'application/json');
+	
+	
+	var wrd = getDefDictionary1("food");
+	
+	
+	//res.send(wrd);
+	if (wrd !== "")
+		res.send("Definition: " + wrd.definition);
+	else res.send("Not found");
+	//res.send("Test:" + getDBCredentialsUrl(process.env.VCAP_SERVICES));
+	res.end();
+});
 /**
  * correct searched word input for example 'fooD' to 'Food'
  * @param {string} searchWord 
@@ -344,7 +344,7 @@ app.get('/api/core/test3', function(req, res){
 
     res.send(upper);
     res.end();
-});
+})
 
 
 app.get('/api/core/test4', function(req, res){
