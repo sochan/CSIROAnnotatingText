@@ -318,21 +318,7 @@ function correctSearchWord(searchWord){
     return upper;
 }
 
-app.get('/api/core/test2', function(req, res){
 
-	//res.setHeader('Content-Type', 'application/json');
-	
-	
-	var wrd = getDefDictionary1("food11");
-	
-	
-	//res.send(wrd);
-	if (typeof wrd !== 'undefined')
-		res.send("Definition: " + wrd.definition);
-	else res.send("Not found");
-	//res.send("Test:" + getDBCredentialsUrl(process.env.VCAP_SERVICES));
-	res.end();
-});
 
 
 app.get('/api/core/test3', function(req, res){
@@ -344,12 +330,12 @@ app.get('/api/core/test3', function(req, res){
 
     res.send(upper);
     res.end();
-})
+});
 
 
 app.get('/api/core/test4', function(req, res){
     
-    var results = getDefFromAdaptors(req.query.searchword);
+    var results = analysis.getDefFromAdaptors(req.query.searchword);
     res.json(results);
 
     res.end();

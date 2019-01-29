@@ -52,7 +52,7 @@ function formHtmlSelect(data){
         i++;
         strResult += "<tr><td>" + i + ") " + word.definition + "<br> Label: "+word.label+"<br> Source: <a href='"+ word.link +"'>" + word.dictionary + "</a>"  + "</td><td><button onclick=\"javascript:selectOneDefinition('"+(i-1)+"');\" style=\"float: right;\">Select</button></td></tr>";
     });
-    strResult += "</tbody></table>"
+    strResult += "</tbody></table>";
     return strResult;
 }
 
@@ -65,6 +65,6 @@ function formHtmlDelete(data){
         i++;
         strResult += "<tr><td>" + i + ") " + word.definition + "<br> Source: <a href='"+ word.link +"'>" + word.dictionary + "</a>"  + "</td><td><button onclick=\"javascript:deleteOneDefinition('"+(i-1)+"');\" style=\"float: right;\">Delete</button></td></tr>";
     });
-    strResult += "</tbody></table>"
+    strResult += "</tbody></table>";
     return strResult;
 }
