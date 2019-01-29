@@ -9,9 +9,11 @@ function selectOneDefinition(docId) {
     
     // insert
     $.post("/api/core/adddocument", selectedDocument, function (dataAdd) {
-        
+
         var searchword = $("#searchword").val();
         $.get("/api/core/readdocument?searchword=" + searchword, function (data) {
+
+
             $("#div_loading").hide();
             $("#td_selected").show().html("");
             resultDb = data; // from DB
@@ -48,7 +50,7 @@ function formHtmlSelect(data){
     
     data.forEach(word => {
         i++;
-        strResult += "<tr><td>" + i + ") " + word.definition + "<br> Source: <a href='"+ word.link +"'>" + word.dictionary + "</a>"  + "</td><td><button onclick=\"javascript:selectOneDefinition('"+(i-1)+"');\" style=\"float: right;\">Select</button></td></tr>";
+        strResult += "<tr><td>" + i + ") " + word.definition + "<br> Label: "+word.label+"<br> Source: <a href='"+ word.link +"'>" + word.dictionary + "</a>"  + "</td><td><button onclick=\"javascript:selectOneDefinition('"+(i-1)+"');\" style=\"float: right;\">Select</button></td></tr>";
     });
     strResult += "</tbody></table>"
     return strResult;

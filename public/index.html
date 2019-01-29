@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html><head>
+<html>
+
+<head>
 	<title>ANNOTATOR</title>
 
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <script src="js/utils.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="js/utils.js"></script>
+
 	<link rel="stylesheet" type="text/css" href="css/style.css" media="all">
+	<link rel="stylesheet" type="text/css" href="css/autocomplete.css" media="all">
 
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
@@ -90,10 +94,22 @@
 	</div>
 </div>
 <br>
+<div id="div_err" style="display:none;"  class="container">
+	<div class="row">
+		<div class="col-md-1"></div>
+		<div class="col-md-10" style="text-align:center;">
+			<label id="error_msg" style="color:red;"></label>
+		</div>
+	</div>
+</div>
+
 <div id="div_loading" style="display:none;" class="container">
 	<div class="row" style="text-align:center;">
 			
 				<div class="loader"></div>
+				<div>
+					<label id="error_msg" style="color:red;"></label>
+				</div>
 		
 	</div>
 </div>
@@ -106,7 +122,7 @@
 				<colgroup><col width="50%">
 				</colgroup><tbody><tr class="active">
 					<th class="th1">Selected Definitions</th>
-					<th class="th1">Found definitions <label id="resultnb"></label></th>
+					<th class="th1">Results <label id="resultnb"></label></th>
 				</tr>
 				<tr>
 					<td style="vertical-align: top; padding: 5px;" id="td_selected"></td>
@@ -125,9 +141,11 @@
 <script>
 
 	$(document).ready(function() {
+
 		/*eslint-env jquery */
 		$( "#btngo" ).click(function() {
 			//alert("click");
+			$("#div_err").hide();
 			$("#div_loading").show();
 			$("#div_result").hide();
 			$("#td_selected").show().html("");
@@ -142,17 +160,40 @@
 			});
 
 			$.post("/api/core/connectonlinedictionary", { "searchword": searchword }, function (dic) {
+				console.log(dic.definitions);
 				$("#div_result").show();
 				$("#div_loading").hide();
-
-				result = dic; // set to global
-				$("#resultnb").html("(" +result.length+ ")");
-				$("#td_results").show().html(formHtmlSelect(result));
+				// alert(dic.error);
+				if (dic.error != "")
+				{
+					$("#div_err").show();
+					$("#error_msg").html(dic.error);
+				}else{
+					result = dic.definitions; // set to global
+					$("#resultnb").html("(" +result.length+ ")");
+					$("#td_results").show().html(formHtmlSelect(result));
+				}
+			
 			});
 		});
+		
+		// Get the input field
+		var input = document.getElementById("searchword");
+
+		// Execute a function when the user releases a key on the keyboard
+		input.addEventListener("keyup", function (event) {
+			// Cancel the default action, if needed
+			event.preventDefault();
+			// Number 13 is the "Enter" key on the keyboard
+			if (event.keyCode === 13) {
+				// Trigger the button element with a click
+				document.getElementById("btngo").click();
+			}
+		});
+		
     });
 	
 </script>
-
+<script src="js/autocomplete.js"></script>
 
 </body></html>
