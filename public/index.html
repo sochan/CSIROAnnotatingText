@@ -7,17 +7,10 @@
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-<<<<<<< HEAD
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="js/utils.js"></script>
 
-=======
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-  <script src="js/utils.js"></script>
->>>>>>> debb556438b4be7da5fcbff4cf9ba9dd8e3b25a7
 	<link rel="stylesheet" type="text/css" href="css/style.css" media="all">
 	<link rel="stylesheet" type="text/css" href="css/autocomplete.css" media="all">
 
@@ -149,20 +142,6 @@
 
 	$(document).ready(function() {
 
-<<<<<<< HEAD
-=======
-
-		// load label for Autocomplete;
-		$.get("/api/core/alllabels", function (data) {
-			console.log(data);
-			$( "#searchword" ).autocomplete({
-				source: data
-			});
-		});
-
-
-
->>>>>>> debb556438b4be7da5fcbff4cf9ba9dd8e3b25a7
 		/*eslint-env jquery */
 		$( "#btngo" ).click(function() {
 			//alert("click");
@@ -181,7 +160,6 @@
 			});
 
 			$.post("/api/core/connectonlinedictionary", { "searchword": searchword }, function (dic) {
-				console.log(dic.definitions);
 				$("#div_result").show();
 				$("#div_loading").hide();
 				// alert(dic.error);
@@ -197,7 +175,8 @@
 			
 			});
 		});
-		
+
+
 		// Get the input field
 		var input = document.getElementById("searchword");
 
@@ -211,9 +190,7 @@
 				document.getElementById("btngo").click();
 			}
 		});
-		
-    });
-	
+	});
 </script>
 <script src="js/autocomplete.js"></script>
 
