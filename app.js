@@ -102,6 +102,7 @@ function initDBConnection() {
 
 initDBConnection();
 
+
 function readAllDocuemnts(callback) {
     db.list({include_docs: true}, function (err, data) {
        var josn_data = JSON.stringify(data);
@@ -132,12 +133,8 @@ function readAllLabels(callback) {
        data.rows.forEach(element => {
             var lbl = element.doc.label;
             console.log(lbl);
-<<<<<<< HEAD
             if (labels.indexOf(lbl) === -1) // not exist
-=======
-            if (labels.indexOf(lbl) == -1) // not exist
->>>>>>> debb556438b4be7da5fcbff4cf9ba9dd8e3b25a7
-                labels.push(lbl)
+                labels.push(lbl);
          });
         callback(labels);
     });
@@ -272,7 +269,7 @@ function isExisted(documents, callback){
 function isExistedResponse(documents){
     
     var result = isExisted(documents, function (data) {
-        if (data["docs"].length == 0) // not exist then insert
+        if (data["docs"].length === 0) // not exist then insert
         {
             documents.forEach(doc => {
                 createDocument(doc, function(data){
@@ -321,6 +318,21 @@ function correctSearchWord(searchWord){
     return upper;
 }
 
+app.get('/api/core/test2', function(req, res){
+
+	//res.setHeader('Content-Type', 'application/json');
+	
+	
+	var wrd = getDefDictionary1("food11");
+	
+	
+	//res.send(wrd);
+	if (typeof wrd !== 'undefined')
+		res.send("Definition: " + wrd.definition);
+	else res.send("Not found");
+	//res.send("Test:" + getDBCredentialsUrl(process.env.VCAP_SERVICES));
+	res.end();
+});
 
 
 app.get('/api/core/test3', function(req, res){
