@@ -75,7 +75,7 @@ module.exports = {
         }
 
         for (var i = 0; i < adaptors.length; i++) {
-            var resUrl = grabUrl(adaptors[i] + resultanalyse.searchword);
+            var resUrl = grabUrl(adaptors[i] + resultanalyse.suggestsearchword);
             if (resUrl.length > 0) //
             {
                 if (resUrl[0].definition !== "") {
