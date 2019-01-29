@@ -132,7 +132,11 @@ function readAllLabels(callback) {
        data.rows.forEach(element => {
             var lbl = element.doc.label;
             console.log(lbl);
+<<<<<<< HEAD
             if (labels.indexOf(lbl) === -1) // not exist
+=======
+            if (labels.indexOf(lbl) == -1) // not exist
+>>>>>>> debb556438b4be7da5fcbff4cf9ba9dd8e3b25a7
                 labels.push(lbl)
          });
         callback(labels);
@@ -268,7 +272,7 @@ function isExisted(documents, callback){
 function isExistedResponse(documents){
     
     var result = isExisted(documents, function (data) {
-        if (data["docs"].length === 0) // not exist then insert
+        if (data["docs"].length == 0) // not exist then insert
         {
             documents.forEach(doc => {
                 createDocument(doc, function(data){
@@ -328,7 +332,7 @@ app.get('/api/core/test3', function(req, res){
 
     res.send(upper);
     res.end();
-});
+})
 
 
 app.get('/api/core/test4', function(req, res){

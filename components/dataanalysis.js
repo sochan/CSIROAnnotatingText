@@ -22,7 +22,11 @@ function grabUrl(url) {
   }
 // update adaptors' API here
 var adaptors = [
+<<<<<<< HEAD
    // "https://annotatingtext.appspot.com/api/adaptor/dictionary1/?term=",
+=======
+    "https://annotatingtext.appspot.com/api/adaptor/dictionary1/?term=",
+>>>>>>> debb556438b4be7da5fcbff4cf9ba9dd8e3b25a7
     "https://annotatingtext.appspot.com/api/adaptor/dictionary2/?term=",
     "https://annotatingtext.appspot.com/api/adaptor/dictionary3/?term=",
     "https://annotatingtext.appspot.com/api/adaptor/dictionary4/?term="
@@ -63,7 +67,10 @@ module.exports = {
      */
     getDefFromAdaptors: function (searchword) {
         var resultanalyse = analyseInput(searchword); // call analyseInput 
+<<<<<<< HEAD
         //console.log(resultanalyse.)
+=======
+>>>>>>> debb556438b4be7da5fcbff4cf9ba9dd8e3b25a7
         var resultFromAdaptor = {
             definitions: [],
             error: resultanalyse.error
@@ -76,10 +83,18 @@ module.exports = {
         }
 
         for (var i = 0; i < adaptors.length; i++) {
+<<<<<<< HEAD
             var resUrl = grabUrl(adaptors[i] + resultanalyse.suggestsearchword);
             if (resUrl.length > 0) //
             {
                 if (resUrl[0].definition != "") {
+=======
+            var resUrl = grabUrl(adaptors[i] + resultanalyse.searchword);
+            if (resUrl.length > 0) //
+            {
+                if (resUrl[0].definition != "") {
+                    // isExistedResponse(resUrl);// insert list into Cached if not yet
+>>>>>>> debb556438b4be7da5fcbff4cf9ba9dd8e3b25a7
                     resultFromAdaptor.definitions.push.apply(resultFromAdaptor.definitions, resUrl);
                 }
 
