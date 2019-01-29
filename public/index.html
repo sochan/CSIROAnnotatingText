@@ -150,6 +150,7 @@
 			$("#div_result").hide();
 			$("#td_selected").show().html("");
 			$("#td_results").show().html("");
+			$("#resultnb").html("(0)");
 			var searchword = $("#searchword").val();
 
 			$.get("/api/core/readdocument?searchword=" + searchword, function (data) {
@@ -163,7 +164,7 @@
 				$("#div_result").show();
 				$("#div_loading").hide();
 				// alert(dic.error);
-				if (dic.error != "")
+				if (dic.error !== "")
 				{
 					$("#div_err").show();
 					$("#error_msg").html(dic.error);

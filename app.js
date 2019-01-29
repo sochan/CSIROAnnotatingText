@@ -132,7 +132,6 @@ function readAllLabels(callback) {
 
        data.rows.forEach(element => {
             var lbl = element.doc.label;
-            console.log(lbl);
             if (labels.indexOf(lbl) === -1) // not exist
                 labels.push(lbl);
          });
