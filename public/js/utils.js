@@ -1,5 +1,19 @@
 var result;
 var resultDb;
+//
+function alreadySelected(definition){
+    var existed = false;
+
+    resultDb.forEach(element => {
+
+        if (element.definition === definition)
+        {
+            existed = true;
+        }
+    });
+    return existed;
+}
+
 // insert into database
 function selectOneDefinition(docId) {
     $("#div_loading").show();
@@ -20,7 +34,7 @@ function selectOneDefinition(docId) {
             $("#td_selected").show().html(formHtmlDelete(resultDb));
         });
     });
-    
+    $("#select_"+ docId).html("");// Hide button
 }
 
 // insert into database
@@ -30,7 +44,7 @@ function deleteOneDefinition(docId) {
     $("#td_selected").show().html("");
     var deletedDocument = resultDb[docId];
     deletedDocument.deleted = "1";
-    console.log(resultDb);
+    //console.log(resultDb);
     // update
     $.post("/api/core/updatedocument", deletedDocument , function (data) {
         var searchword = $("#searchword").val();
@@ -50,9 +64,15 @@ function formHtmlSelect(data){
     
     data.forEach(word => {
         i++;
-        strResult += "<tr><td>" + i + ") " + word.definition + "<br> Label: "+word.label+"<br> Source: <a href='"+ word.link +"'>" + word.dictionary + "</a>"  + "</td><td><button onclick=\"javascript:selectOneDefinition('"+(i-1)+"');\" style=\"float: right;\">Select</button></td></tr>";
+        var btnSelect = "<button onclick=\"javascript:selectOneDefinition('"+(i-1)+"');\" style=\"float: right;\">Select</button>";
+        var alreadySave = alreadySelected(word.definition);
+        //console.log(i + "; " + alreadySave);
+        if (alreadySave)
+            btnSelect = "";
+        strResult += "<tr><td>" + i + ") " + word.definition + "<br> Label: "+word.label+"<br> Source: <a href='"+ word.link +"'>" + word.dictionary + "</a>"  +
+         "</td><td><div id='select_"+(i-1)+"'>"+btnSelect+"</div></td></tr>";
     });
-    strResult += "</tbody></table>";
+    strResult += "</tbody></table>"
     return strResult;
 }
 
@@ -65,6 +85,6 @@ function formHtmlDelete(data){
         i++;
         strResult += "<tr><td>" + i + ") " + word.definition + "<br> Source: <a href='"+ word.link +"'>" + word.dictionary + "</a>"  + "</td><td><button onclick=\"javascript:deleteOneDefinition('"+(i-1)+"');\" style=\"float: right;\">Delete</button></td></tr>";
     });
-    strResult += "</tbody></table>";
+    strResult += "</tbody></table>"
     return strResult;
 }
