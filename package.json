@@ -13,7 +13,8 @@
 		"express-session": "latest",
 		"connect-cloudant-store": "latest",
 		"cloudant": "latest",
-		"xmlhttprequest": "latest"
+		"xmlhttprequest": "latest",
+		"axios": "latest"
 	},
 	"repository": {},
 	"engines": {

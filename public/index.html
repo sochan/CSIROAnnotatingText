@@ -166,7 +166,7 @@
 				resultDb = data; // from DB
 				$("#td_selected").show().html(formHtmlDeleteCard(resultDb));
 
-				$.post("/api/core/connectonlinedictionary", { "searchword": searchword }, function (dic) {
+				$.get("/api/core/connectonlinedictionary?searchword=" + searchword, function (dic) {
 					$("#div_result").show();
 					$("#div_loading").hide();
 					// alert(dic.error);

@@ -2,7 +2,7 @@
 
 // Call other components
 
-var analysis = require('./components/dataanalysis');
+//var analysis = require('./components/dataanalysis');
 
 //------------------------------------------------------------------------------
 // node.js starter application for Bluemix
@@ -114,6 +114,7 @@ function readAllDocuemnts(callback) {
     });
     return null;
 }
+
 // Read All Documents
 app.get('/api/core/allwords', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
@@ -203,11 +204,87 @@ app.get('/api/core/readdocument', function (req, res) {
 });
 
 
-app.post('/api/core/connectonlinedictionary', function(req, res){
-    var getOnlineDictionaries = analysis.getDefFromAdaptors(req.body.searchword);
-    res.send(getOnlineDictionaries);
-    res.end();
+///////////////////// Connect to Adaptor 
+var axios = require('axios');
+app.get('/api/core/connectonlinedictionary', function(req, res){
+    var searchword = req.query.searchword;
+    var resultanalyse = analyseInput(searchword); // call analyseInput 
+        
+    var resultFromAdaptor = {
+        definitions: [],
+        error: resultanalyse.error
+    };
+
+     // Check error message, then not grab the API
+    if (resultanalyse.error !== "") {
+        resultFromAdaptor.error = resultanalyse.error;
+        res.json(resultFromAdaptor);
+    }
+    else{
+        grabUrl(resultanalyse.suggestsearchword, function(data){
+
+            resultFromAdaptor.definitions = data;
+
+            res.json(resultFromAdaptor);
+            res.end();
+        });
+    }
 });
+
+
+function grabUrl(searchword, callback) {
+    
+    axios.all([
+        axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary5/?term=' + searchword),
+        axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary2/?term=' + searchword),
+        axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary3/?term=' + searchword),
+        axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary4/?term=' + searchword)
+        //axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary1/?term=' + searchword),
+    ]).then(axios.spread((response1, response2, response3, response4) => {
+        var myresult = concatarray(response1.data, response2.data);
+        myresult= concatarray(myresult, response3.data);
+        myresult = concatarray(myresult, response4.data);
+        callback(myresult);
+    })).catch(error => {
+        console.log(error);
+    });
+}
+
+function concatarray(arr1, arr2){
+    var myresult = arr1;
+    if (arr2.length >0){
+        if (arr2[0].definition != "")
+            myresult = myresult.concat(arr2);
+    }
+    return myresult;
+}
+
+function analyseInput(searchword){ 
+
+    var output ={
+        origsearchword: searchword,
+        suggestsearchword: "",
+        error : ""
+    };
+
+    var sugword= searchword.toLowerCase();
+    sugword = sugword.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g,'_'); // replace sepcial chars with empty char
+    sugword = sugword.trim(); // remove spaces
+
+    output.suggestsearchword = sugword;
+
+
+    var txtLength = output.suggestsearchword.length; // get length 
+    
+    if(txtLength > 256){
+        output.error = "Your search text is too long";
+    }
+
+    return output;
+}
+
+
+///////////////////// 
 
 function readDocumentById(docId, callback) {
     var query = {selector: {_id: docId, deleted: "0"}};
@@ -289,21 +366,6 @@ function isExistedResponse(documents){
  * Testing
  */
 
-app.get('/api/core/test1', function(req, res){
-
-	//res.setHeader('Content-Type', 'application/json');
-	
-	
-	var wrd = getDefDictionary1("food");
-	
-	
-	//res.send(wrd);
-	if (wrd !== "")
-		res.send("Definition: " + wrd.definition);
-	else res.send("Not found");
-	//res.send("Test:" + getDBCredentialsUrl(process.env.VCAP_SERVICES));
-	res.end();
-});
 /**
  * correct searched word input for example 'fooD' to 'Food'
  * @param {string} searchWord 
@@ -318,8 +380,6 @@ function correctSearchWord(searchWord){
 }
 
 
-
-
 app.get('/api/core/test3', function(req, res){
     var str = "fooD";
     str = str.toLowerCase();
@@ -329,18 +389,16 @@ app.get('/api/core/test3', function(req, res){
 
     res.send(upper);
     res.end();
-});
-
+})
 
 app.get('/api/core/test4', function(req, res){
     
-    var results = analysis.getDefFromAdaptors(req.query.searchword);
-    res.json(results);
-
-    res.end();
-    
-
+    var s = grabUrl(req.query.searchword, function(data){
+        res.json(data);
+        res.end();
+    });
 });
+
 
 /*
  * End Testing
