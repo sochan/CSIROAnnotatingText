@@ -14,6 +14,9 @@ var bodyParser = require('body-parser');
 // for more info, see: http://expressjs.com
 var express = require('express');
 
+// Call Python
+const spawn = require("child_process").spawn;
+
 // cfenv provides access to your Cloud Foundry environment
 // for more info, see: https://www.npmjs.com/package/cfenv
 var cfenv = require('cfenv');
@@ -114,6 +117,16 @@ function readAllDocuemnts(callback) {
     });
     return null;
 }
+
+// Endpoin to call Python
+app.get('/api/data/callpy', function(req, res){
+    const pythonProcess = spawn('python',["./public/NLP/hello.py", "Search Text"]);
+    pythonProcess.stdout.on('data', (data) => {
+        // Do something with the data returned from python script
+        res.send(data);
+        res.end();
+    });
+});
 
 // Read All Documents
 app.get('/api/core/allwords', function (req, res) {
