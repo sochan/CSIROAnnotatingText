@@ -120,7 +120,7 @@ function readAllDocuemnts(callback) {
 
 // Endpoin to call Python
 app.get('/api/data/callpy', function(req, res){
-    const pythonProcess = spawn('python',["./public/NLP/hello.py", "Search Text"]);
+    const pythonProcess = spawn('python',["./public/NLP/Textanalysis.py", " Sample Search Text"]);
     pythonProcess.stdout.on('data', (data) => {
         // Do something with the data returned from python script
         res.send(data);
