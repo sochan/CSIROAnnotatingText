@@ -412,10 +412,6 @@ app.get('/api/data/nlpanalyse', function(req, res){
 });
 
 
-async function AnalyseTextNLU(textSearch){
-    
-}
-
 /*
 * End Natural Language Understanding
 */
