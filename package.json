@@ -15,7 +15,8 @@
 		"express": "4.15.x",
 		"express-session": "latest",
 		"ibm-watson": "^4.1.0",
-		"xmlhttprequest": "latest"
+		"xmlhttprequest": "latest",
+		"ibm-watson/natural-language-understanding/v1": "latest"
 	},
 	"repository": {},
 	"engines": {
