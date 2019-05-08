@@ -39,17 +39,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-// start server on the specified port and binding host
-app.listen(appEnv.port, '0.0.0.0', function() {
-  // print a message when the server starts listening
-  console.log("server starting on " + appEnv.url);
-});
-
-
 var db;
 
 var cloudant;
-
 
 var dbCredentials = {
     dbName: 'annotator-b'
@@ -120,7 +112,7 @@ function readAllDocuemnts(callback) {
 
 // Endpoin to call Python
 app.get('/api/data/callpy', function(req, res){
-    const pythonProcess = spawn('python',["./public/NLP/Textanalysis.py", " Sample Search Text"]);
+    const pythonProcess = spawn('python',["./public/NLP/hello.py", " Sample Search Text"]);
     pythonProcess.stdout.on('data', (data) => {
         // Do something with the data returned from python script
         res.send(data);
@@ -373,6 +365,60 @@ function isExistedResponse(documents){
  *  End Core
  */
 
+/*
+ * Natural Language Understanding
+ */
+
+
+const NaturalLanguageUnderstandingV1 = require('ibm-watson/natural-language-understanding/v1');
+
+const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
+  version: '2019-04-02',
+  iam_apikey: 'YZ3C9wBFRz5CkDSbewAXnzAmk6C4zgLNbMT27rNBLZjq',
+  url: 'https://gateway.watsonplatform.net/natural-language-understanding/api'
+});
+
+app.get('/api/data/nlpanalyse', function(req, res){
+	
+	var searchText = req.query.searchword;
+    const analyzeParams = {
+        'text': searchText,
+        //'url' : 'www.ibm.com',
+        'features': {
+          'entities': {
+            'emotion': true,
+            'sentiment': true,
+            'limit': 2,
+          },
+          'keywords': {
+            'emotion': true,
+            'sentiment': true,
+            'limit': 5,
+          },
+        },
+      };
+      
+      
+      naturalLanguageUnderstanding.analyze(analyzeParams)
+        .then(analysisResults => {
+            
+            res.send(JSON.stringify(analysisResults, null, 2));
+            res.end();
+        })
+        .catch(err => {
+            res.send ("ERR:", err);
+            res.end();
+        });
+});
+
+
+async function AnalyseTextNLU(textSearch){
+    
+}
+
+/*
+* End Natural Language Understanding
+*/
 
 
 /*
@@ -416,5 +462,13 @@ app.get('/api/core/test4', function(req, res){
 /*
  * End Testing
  */
+
+
+// start server on the specified port and binding host
+app.listen(appEnv.port, '0.0.0.0', function() {
+    // print a message when the server starts listening
+    console.log("server starting on " + appEnv.url);
+  });
+  
 
 module.exports = app;

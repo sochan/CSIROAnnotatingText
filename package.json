@@ -6,15 +6,16 @@
 		"start": "node app.js"
 	},
 	"dependencies": {
-		"express": "4.15.x",
-		"cfenv": "1.0.x",
+		"axios": "latest",
 		"body-parser": "^1.18.3",
-		"cors": "^2.7.1",
-		"express-session": "latest",
-		"connect-cloudant-store": "latest",
+		"cfenv": "1.0.x",
 		"cloudant": "latest",
-		"xmlhttprequest": "latest",
-		"axios": "latest"
+		"connect-cloudant-store": "latest",
+		"cors": "^2.7.1",
+		"express": "4.15.x",
+		"express-session": "latest",
+		"ibm-watson": "^4.1.0",
+		"xmlhttprequest": "latest"
 	},
 	"repository": {},
 	"engines": {
