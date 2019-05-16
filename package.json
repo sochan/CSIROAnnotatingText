@@ -8,13 +8,14 @@
 	"dependencies": {
 		"axios": "latest",
 		"body-parser": "^1.18.3",
-		"cfenv": "1.0.x",
+		"cfenv": "^1.2.2",
 		"cloudant": "latest",
 		"connect-cloudant-store": "latest",
 		"cors": "^2.7.1",
-		"express": "4.15.x",
+		"express": "^4.16.4",
 		"express-session": "latest",
 		"ibm-watson": "^4.1.0",
+		"stopword": "^0.2.4",
 		"xmlhttprequest": "latest"
 	},
 	"repository": {},

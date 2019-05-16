@@ -15,7 +15,7 @@ var bodyParser = require('body-parser');
 var express = require('express');
 
 // Call Python
-const spawn = require("child_process").spawn;
+//const spawn = require("child_process").spawn;
 
 // cfenv provides access to your Cloud Foundry environment
 // for more info, see: https://www.npmjs.com/package/cfenv
@@ -109,7 +109,7 @@ function readAllDocuemnts(callback) {
     });
     return null;
 }
-
+/*
 // Endpoin to call Python
 app.get('/api/data/callpy', function(req, res){
     const pythonProcess = spawn('python',["./public/NLP/hello.py", " Sample Search Text"]);
@@ -119,7 +119,7 @@ app.get('/api/data/callpy', function(req, res){
         res.end();
     });
 });
-
+*/
 // Read All Documents
 app.get('/api/core/allwords', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
@@ -372,6 +372,8 @@ function isExistedResponse(documents){
 
 const NaturalLanguageUnderstandingV1 = require('ibm-watson/natural-language-understanding/v1');
 
+stopWord = require('stopword');
+
 const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
   version: '2019-04-02',
   iam_apikey: 'YZ3C9wBFRz5CkDSbewAXnzAmk6C4zgLNbMT27rNBLZjq',
@@ -409,6 +411,18 @@ app.get('/api/data/nlpanalyse', function(req, res){
             res.send ("ERR:", err);
             res.end();
         });
+});
+
+app.get('/api/data/removestopwords', function(req, res){
+    
+    const oldStr = 'a really Interesting string with some words';
+    var oldString = oldStr.split(' ');
+    const newString = stopWord.removeStopwords(oldString);
+
+    res.send(newString + "| OLD: " + oldStr);
+    res.end();
+
+    // newString is now [ 'really', 'Interesting', 'string', 'words' ]
 });
 
 
