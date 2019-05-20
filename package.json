@@ -15,8 +15,7 @@
 		"express": "^4.16.4",
 		"express-session": "latest",
 		"ibm-watson": "^4.1.0",
-		"stopword": "^0.2.4",
-		"xmlhttprequest": "latest"
+		"stopword": "^0.2.4"
 	},
 	"repository": {},
 	"engines": {

@@ -211,49 +211,6 @@ app.get('/api/core/readdocument', function (req, res) {
 
 ///////////////////// Connect to Adaptor 
 var axios = require('axios');
-app.get('/api/core/connectonlinedictionary', function(req, res){
-    var searchword = req.query.searchword;
-    var resultanalyse = analyseInput(searchword); // call analyseInput 
-        
-    var resultFromAdaptor = {
-        definitions: [],
-        error: resultanalyse.error
-    };
-
-     // Check error message, then not grab the API
-    if (resultanalyse.error !== "") {
-        resultFromAdaptor.error = resultanalyse.error;
-        res.json(resultFromAdaptor);
-    }
-    else{
-        grabUrl(resultanalyse.suggestsearchword, function(data){
-
-            resultFromAdaptor.definitions = data;
-
-            res.json(resultFromAdaptor);
-            res.end();
-        });
-    }
-});
-
-
-function grabUrl(searchword, callback) {
-    
-    axios.all([
-        axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary5/?term=' + searchword),
-        axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary2/?term=' + searchword),
-        axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary3/?term=' + searchword),
-        axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary4/?term=' + searchword)
-        //axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary1/?term=' + searchword),
-    ]).then(axios.spread((response1, response2, response3, response4) => {
-        var myresult = concatarray(response1.data, response2.data);
-        myresult= concatarray(myresult, response3.data);
-        myresult = concatarray(myresult, response4.data);
-        callback(myresult);
-    })).catch(error => {
-        console.log(error);
-    });
-}
 
 function concatarray(arr1, arr2){
     var myresult = arr1;
@@ -287,6 +244,46 @@ function analyseInput(searchword){
 
     return output;
 }
+
+
+var allAdaptors = [ 'https://annotatingtext.appspot.com/api/adaptor/dictionary5/?term=',
+                    'https://annotatingtext.appspot.com/api/adaptor/dictionary2/?term=',
+                    'https://annotatingtext.appspot.com/api/adaptor/dictionary3/?term=',
+                    'https://annotatingtext.appspot.com/api/adaptor/dictionary4/?term='];
+
+async function GetDefinitions(searchText, callback) {
+    // Get words from fielter
+    var words = FilterInput(searchText);
+    var requestManyAxios = [];
+    for(var i =0; i< allAdaptors.length; i++){
+        for (var j =0; j< words.length; j++){
+            requestManyAxios.push(axios.get(allAdaptors[i] + words[j]))
+        }
+    }
+    
+    try{
+        var responses = await axios.all(requestManyAxios);
+        callback(responses);
+    } catch (err){
+        callback(err);
+    }
+}
+
+app.get('/api/core/definitions', function (req, res){
+    var resultFromAdaptor = {
+        definitions: [],
+        error: ""
+    };
+    var searchword = req.query.searchword;
+    GetDefinitions(searchword, function(dataFromAdaptor){
+        for (var i = 0; i < dataFromAdaptor.length; i++)
+        {
+            resultFromAdaptor.definitions = concatarray(resultFromAdaptor.definitions, dataFromAdaptor[i].data);
+        }
+        res.send(resultFromAdaptor);
+        res.end();
+    });
+});
 
 
 ///////////////////// 
@@ -413,13 +410,18 @@ app.get('/api/data/nlpanalyse', function(req, res){
         });
 });
 
+// Remove stopwords with Stopword of NodeJS 
+// https://www.npmjs.com/package/stopword
+
+function FilterInput(searchText){
+    return stopWord.removeStopwords(searchText.split(' '));
+}
+
 app.get('/api/data/removestopwords', function(req, res){
     
     const oldStr = 'a really Interesting string with some words';
-    var oldString = oldStr.split(' ');
-    const newString = stopWord.removeStopwords(oldString);
 
-    res.send(newString + "| OLD: " + oldStr);
+    res.send(FilterInput(oldStr));
     res.end();
 
     // newString is now [ 'really', 'Interesting', 'string', 'words' ]
@@ -458,14 +460,6 @@ app.get('/api/core/test3', function(req, res){
 
     res.send(upper);
     res.end();
-})
-
-app.get('/api/core/test4', function(req, res){
-    
-    var s = grabUrl(req.query.searchword, function(data){
-        res.json(data);
-        res.end();
-    });
 });
 
 
