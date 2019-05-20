@@ -251,7 +251,7 @@ var allAdaptors = [ 'https://annotatingtext.appspot.com/api/adaptor/dictionary5/
                     'https://annotatingtext.appspot.com/api/adaptor/dictionary3/?term=',
                     'https://annotatingtext.appspot.com/api/adaptor/dictionary4/?term='];
 
-async function GetDefinitions(searchText, callback) {
+const GetDefinitions = async(searchText, callback)=> {
     // Get words from fielter
     var words = FilterInput(searchText);
     var requestManyAxios = [];
@@ -369,7 +369,7 @@ function isExistedResponse(documents){
 
 const NaturalLanguageUnderstandingV1 = require('ibm-watson/natural-language-understanding/v1');
 
-stopWord = require('stopword');
+const stopWord = require('stopword');
 
 const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
   version: '2019-04-02',

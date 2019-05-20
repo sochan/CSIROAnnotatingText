@@ -19,6 +19,6 @@
 	},
 	"repository": {},
 	"engines": {
-		"node": "6.x"
+		"node": "9.x"
 	}
 }
