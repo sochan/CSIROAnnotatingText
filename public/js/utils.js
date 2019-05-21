@@ -110,13 +110,22 @@ function formHtmlDelete(data){
     return strResult;
 }
 
+function dispayCategories(categories){
+    //console.log(categories);
+    var str = "";
+    for(var i =0; i < categories.length; i++){
+        str += "<div>"+categories[i].label + "("+categories[i].score+")" +"</div>";
+    }
+    return str;
+}
+
 function createSelectCard(document, id){
 
+   
     var btnSelect = "<a href=\"javascript:selectOneDefinition('"+id+"');\">SELECT</a>";
     var alreadySave = alreadySelected(document.definition);
     if (alreadySave)
         btnSelect = "";
-
     var strResult =  "<div class=\"row\">"
                         +"<div class=\"col s12 m15\">"
                             +"<div class=\"card blue-grey darken-1\">"
@@ -124,6 +133,8 @@ function createSelectCard(document, id){
                                     +"<span class=\"card-title\"><a rel=\"noopener noreferrer\" target=\"_blank\" href=\""+ document.link+"\">" + document.dictionary + "</a></span>"
                                     +"<p>" + document.definition + "</p>"
                                 +"</div>"
+                                +"<div>Categories: </div>"
+                                +dispayCategories(document.categories)
                                 +"<div class=\"card-action\">"
                                     +"<div id='select_"+id+"'>"+btnSelect+"</div>"
                                 +"</div>"
@@ -132,13 +143,16 @@ function createSelectCard(document, id){
                     +"</div>";
     return strResult;
 }
+
 function formHtmlSelectCard(data){
     var strResult = "";
     var i= 0;
+    
     data.forEach(word => {
         strResult += createSelectCard(word, i);
         i++;
     });
+    
     return strResult;
 }
 

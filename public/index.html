@@ -175,15 +175,14 @@
 						$("#div_err").show();
 						$("#error_msg").html(dic.error);
 					}else{
-						result = dic.definitions; // set to global
-						$("#resultnb").html("(" +result.length+ ")");
-						$("#td_results").show().html(formHtmlSelectCard(result));
+						//
+						$("#resultnb").html("(" +dic.definitions.length + ")");
+						$("#td_results").show().html(formHtmlSelectCard(dic.definitions));
+
 					}
 				});
-
 			});
 
-			
 		});
 
 

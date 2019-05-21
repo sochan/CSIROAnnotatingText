@@ -213,10 +213,17 @@ app.get('/api/core/readdocument', function (req, res) {
 var axios = require('axios');
 
 function concatarray(arr1, arr2){
+    const limitNbDef = 10;
     var myresult = arr1;
     if (arr2.length >0){
         if (arr2[0].definition != "")
-            myresult = myresult.concat(arr2);
+            if (arr2.length> limitNbDef)
+            {
+                var tempArr = arr2.slice(0, limitNbDef)
+                myresult = myresult.concat(tempArr);
+            } else {
+                myresult = myresult.concat(arr2);
+            }
     }
     return myresult;
 }
@@ -238,7 +245,7 @@ function analyseInput(searchword){
 
     var txtLength = output.suggestsearchword.length; // get length 
     
-    if(txtLength > 256){
+    if(txtLength > 2048){
         output.error = "Your search text is too long";
     }
 
@@ -249,14 +256,32 @@ function analyseInput(searchword){
 var allAdaptors = [ 'https://annotatingtext.appspot.com/api/adaptor/dictionary5/?term=',
                     'https://annotatingtext.appspot.com/api/adaptor/dictionary2/?term=',
                     'https://annotatingtext.appspot.com/api/adaptor/dictionary3/?term=',
-                    'https://annotatingtext.appspot.com/api/adaptor/dictionary4/?term='];
+                    'https://annotatingtext.appspot.com/api/adaptor/dictionary4/?term='
+                ];
+
+
+async function GetAllCategories(definitions, callback){
+    // Get categories;
+    try{
+        var reqCateAxios = [];
+        for (var k = 0; k < definitions.length; k++){
+            reqCateAxios.push(axios.get(appEnv.url + '/api/data/categories?definition=' + definitions[k].definition));
+        }
+        var listCategories = await axios.all(reqCateAxios);
+        callback(listCategories);
+    } catch (err){
+        console.log(err);
+    }
+}
 
 const GetDefinitions = async(searchText, callback)=> {
     // Get words from fielter
     var words = FilterInput(searchText);
     var requestManyAxios = [];
     for(var i =0; i< allAdaptors.length; i++){
+        
         for (var j =0; j< words.length; j++){
+
             requestManyAxios.push(axios.get(allAdaptors[i] + words[j]))
         }
     }
@@ -265,26 +290,63 @@ const GetDefinitions = async(searchText, callback)=> {
         var responses = await axios.all(requestManyAxios);
         callback(responses);
     } catch (err){
-        callback(err);
+        console.log(err);
     }
 }
 
+
 app.get('/api/core/definitions', function (req, res){
     var resultFromAdaptor = {
-        definitions: [],
-        error: ""
+        "definitions": [],
+        "error": ""
     };
     var searchword = req.query.searchword;
+  
     GetDefinitions(searchword, function(dataFromAdaptor){
         for (var i = 0; i < dataFromAdaptor.length; i++)
         {
             resultFromAdaptor.definitions = concatarray(resultFromAdaptor.definitions, dataFromAdaptor[i].data);
         }
-        res.send(resultFromAdaptor);
-        res.end();
+
+        GetAllCategories(resultFromAdaptor.definitions, function(myData){
+
+            console.log("nbDef: " + resultFromAdaptor.definitions.length + "; Nb cat: " + myData.length);
+            var newResultFromAdaptor = {
+                "definitions": [],
+                "error": ""
+            };
+            
+
+            for (var i = 0; i < resultFromAdaptor.definitions.length; i++){
+
+                var definition = {
+                    "label": resultFromAdaptor.definitions[i].label,
+                    "definition": resultFromAdaptor.definitions[i].definition,
+                    "link": "",
+                    "dictionary": resultFromAdaptor.definitions[i].dictionary,
+                    "categories": myData[i].data
+                }
+                newResultFromAdaptor.definitions.push(definition);
+            }
+
+            res.send(newResultFromAdaptor);
+            res.end();
+        });
+        //
     });
+    
 });
 
+app.get('/api/test', function (req, res){
+    axios.get(appEnv.url + '/api/data/categories?definition=A response indicating that an individual does not really enjoy food.')
+    .then(response => {
+        res.send(response.data);
+        res.end();
+    })
+    .catch(error => {
+        console.log(error);
+    });
+});
 
 ///////////////////// 
 
@@ -377,37 +439,35 @@ const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
   url: 'https://gateway.watsonplatform.net/natural-language-understanding/api'
 });
 
-app.get('/api/data/nlpanalyse', function(req, res){
-	
-	var searchText = req.query.searchword;
+
+const GetCategories = async(definition, callback)=>{
+    
     const analyzeParams = {
-        'text': searchText,
-        //'url' : 'www.ibm.com',
+        'text': definition,
         'features': {
-          'entities': {
-            'emotion': true,
-            'sentiment': true,
-            'limit': 2,
-          },
-          'keywords': {
-            'emotion': true,
-            'sentiment': true,
-            'limit': 5,
+          'categories': {
+            'limit': 3,
           },
         },
       };
-      
-      
+
       naturalLanguageUnderstanding.analyze(analyzeParams)
         .then(analysisResults => {
-            
-            res.send(JSON.stringify(analysisResults, null, 2));
-            res.end();
+            callback(analysisResults)
         })
         .catch(err => {
-            res.send ("ERR:", err);
-            res.end();
+            callback("ERR:", err);
         });
+}
+
+app.get('/api/data/categories', function(req, res){
+	var definition = req.query.definition;
+      GetCategories(definition, function(data){
+        //console.log(data.categories);
+        res.send(data.categories);
+        res.end();
+      });
+      
 });
 
 // Remove stopwords with Stopword of NodeJS 
