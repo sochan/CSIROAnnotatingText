@@ -38,7 +38,8 @@ function selectOneDefinition(docId) {
     // insert
     $.post("/api/core/adddocument", selectedDocument, function (dataAdd) {
 
-        var searchword = $("#searchword").val();
+        //var searchword = $("#searchword").val();
+        var searchword = selectedDocument.definition.label;
         $.get("/api/core/readdocument?searchword=" + searchword, function (data) {
 
 
@@ -63,7 +64,8 @@ function deleteOneDefinition(docId) {
     //console.log(resultDb);
     // update
     $.post("/api/core/updatedocument", deletedDocument , function (data) {
-        var searchword = $("#searchword").val();
+        //var searchword = $("#searchword").val();
+        var searchword = deletedDocument.definition.label;
         $.get("/api/core/readdocument?searchword=" + searchword, function (readdata) {
             $("#div_loading").hide();
             /* Get definitions from Cached DB */
