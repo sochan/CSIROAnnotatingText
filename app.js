@@ -528,15 +528,6 @@ app.get('/api/core/test3', function(req, res){
  * End Testing
  */
 ///disable/enable dictionary
-app.post('/api/core/adddocument/', function (req, res) {
-    var document = req.body;
-  createDocument(document, function(data) {
-        res.setHeader('Content-Type', 'application/json');
-        res.send(data);
-        res.end();
-    });
-     
-});
 
 ///Tab closing post request
 app.post('/api/core/adddocumentIndexedDB/', function (req, res) {
