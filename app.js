@@ -171,7 +171,8 @@ function createDocument(document, callback) {
         "definition": document.definition,
         "dictionary": document.dictionary,
         "deleted": document.deleted,
-        "link": document.link
+        "link": document.link,
+        "defID":document.defID
     }, function (err, data) {
         callback(data);
     });
@@ -526,7 +527,212 @@ app.get('/api/core/test3', function(req, res){
 /*
  * End Testing
  */
+///disable/enable dictionary
+app.post('/api/core/adddocument/', function (req, res) {
+    var document = req.body;
+  createDocument(document, function(data) {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(data);
+        res.end();
+    });
+     
+});
 
+///Tab closing post request
+app.post('/api/core/adddocumentIndexedDB/', function (req, res) {
+    var document = req.body;
+    console.log(document);
+  checkDefinition(document, function(data) {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(data);
+        res.end();
+    });
+     
+});
+
+function checkDefinition(document,callback){
+    for (var i = 0; i < document.length; i++) {
+        var resultDB;
+        var resultDB=document[i].link;
+        var dataID=document[i]._id;
+         readDocument(document.label, function (data) { //req.body.searchword
+            
+            resultDB=data;
+        });
+        var dataLab = JSLINQ(resultDB)
+        .Where(function(item){ return item.link == resultDB; });
+         if(dataLab.items.length!=0){
+                                             var dataLabDef=dataLab.items[0].definition;
+                                            //if(dataDef==dataLabDef){
+                                                console.log(dataID);
+                                                //console.log(dataLab.items[0]._id);
+                                            if(dataID===undefined){
+                                                console.log("User may delete the definition and then again selected")
+                                            }
+                                            else{
+                                              
+                                                    console.log("Data Created!!!!");
+                                            }
+                                        }
+                                        else{
+                                            if(dataID===undefined){
+                                                  createDocument(document, function(data) {
+                                                    callback=data;
+                                                });
+                                                    console.log("New data Created");
+                                              
+                                            }
+                                            else{
+                                           updateDocument(document, function(data)
+                                                {
+                                                    callback=data;
+                                                });
+                                             console.log("Data Updated");
+                                                
+                                            }
+                                        }
+    }
+
+}
+
+
+///////////////////// Connect to Adaptor 
+var axios = require('axios');
+app.post('/api/core/connectonlinedictionary', function(req, res){
+    var searchword = req.body.searchword;
+    var checkValAll=req.body.checkValAll;
+    console.log(req.body);
+    var resultanalyse = analyseInput(searchword); // call analyseInput 
+        
+    var resultFromAdaptor = {
+        definitions: [],
+        error: resultanalyse.error
+    };
+
+     // Check error message, then not grab the API
+    if (resultanalyse.error !== "") {
+        resultFromAdaptor.error = resultanalyse.error;
+        res.json(resultFromAdaptor);
+    }
+    else{
+        var params={searchword:resultanalyse.suggestsearchword,'dic1':req.body.dic1,'dic2':req.body.dic2,'dic3':req.body.dic3,'dic4':req.body.dic4,'dic5':req.body.dic5};
+        console.log(params);
+        grabUrl(params, function(data){
+
+            resultFromAdaptor.definitions = data;
+            console.log('data'+data);
+            res.json(resultFromAdaptor);
+            res.end();
+        });
+    }
+});
+
+
+function grabUrl(params, callback) {
+   if(params.dic1==''&&params.dic2==''&&params.dic3==''&&params.dic4==''&&params.dic5=='') {
+    axios.all([
+        
+        axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary5/?term=' + params.searchword),
+        axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary2/?term=' + params.searchword),
+        axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary3/?term=' + params.searchword),
+        axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary4/?term=' + params.searchword)
+        //axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary1/?term=' + params.searchword),
+    ]).then(axios.spread((response1, response2, response3, response4) => {
+        var myresult = concatarray(response1.data, response2.data);
+        myresult= concatarray(myresult, response3.data);
+        myresult = concatarray(myresult, response4.data);
+        callback(myresult);
+    })).catch(error => {
+        console.log(error);
+    });
+}
+
+else{
+ 
+    var urlAll=[];
+    var urlRes=[];
+    if(params.dic1=='1') {
+        urlAll.push(axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary1/?term=' + params.searchword));
+        urlRes.push('response1');
+    }
+if(params.dic2=='2') {
+ urlAll.push(axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary2/?term=' + params.searchword));
+ urlRes.push('response2');
+}
+if(params.dic3=='3') {
+   urlAll.push(axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary3/?term=' + params.searchword));
+   urlRes.push('response3');
+}
+if(params.dic4=='4') {
+  urlAll.push(axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary4/?term=' + params.searchword));
+  urlRes.push('response4');
+}
+if(params.dic5=='5') {
+   urlAll.push(axios.get('https://annotatingtext.appspot.com/api/adaptor/dictionary5/?term=' + params.searchword));
+   urlRes.push('response5');
+}
+console.log(urlAll.length);
+console.log(urlRes[0]);
+ 
+        if(urlAll.length>0){
+            if(urlAll.length==1){
+                axios.all( urlAll
+                         ).then(axios.spread(urlRes=> {
+                         callback(urlRes.data);
+                         })).catch(error => {
+                         console.log(error);
+                         });
+            }
+            if(urlAll.length==2){
+                axios.all( urlAll
+                         ).then(axios.spread((response1, response2)=> {
+                          var myresult = concatarray(response1.data,response2.data);
+                             callback(myresult);
+                         })).catch(error => {
+                         console.log(error);
+                         });
+               
+            }
+            if(urlAll.length==3){
+                axios.all( urlAll)
+                .then(axios.spread((response1, response2,response3)=> {
+                          var myresult = concatarray(response1.data,response2.data);
+                          myresult= concatarray(myresult, response3.data);
+                             callback(myresult);
+                         })).catch(error => {
+                         console.log(error);
+                         });
+            }
+            if(urlAll.length==4){
+                 axios.all( urlAll)
+                .then(axios.spread((response1, response2,response3,response4)=> {
+                          var myresult = concatarray(response1.data,response2.data);
+                          myresult= concatarray(myresult, response3.data);
+                            myresult= concatarray(myresult,response4.data);
+                             callback(myresult);
+                         })).catch(error => {
+                         console.log(error);
+                         });
+            }
+            if(urlAll.length==5){
+                   axios.all( urlAll)
+                .then(axios.spread((response1, response2,response3,response4,response5)=> {
+                          var myresult = concatarray(response1.data,response2.data);
+                          myresult= concatarray(myresult, response3.data);
+                            myresult= concatarray(myresult,response4.data);
+                             myresult= concatarray(myresult,response5.data);
+                             callback(myresult);
+                         })).catch(error => {
+                         console.log(error);
+                         });
+            }
+        }
+        
+   
+}
+
+
+////
 
 // start server on the specified port and binding host
 app.listen(appEnv.port, '0.0.0.0', function() {
