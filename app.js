@@ -253,10 +253,12 @@ function analyseInput(searchword){
 }
 
 
-var allAdaptors = [ 'https://annotatingtext.appspot.com/api/adaptor/dictionary5/?term=',
-                    'https://annotatingtext.appspot.com/api/adaptor/dictionary2/?term=',
-                    'https://annotatingtext.appspot.com/api/adaptor/dictionary3/?term=',
-                    'https://annotatingtext.appspot.com/api/adaptor/dictionary4/?term='
+var allAdaptors = [ 
+                    //"https://annotatingtext.appspot.com/api/adaptor/dictionary1/?term=",
+                    "https://annotatingtext.appspot.com/api/adaptor/dictionary2/?term=",
+                    "https://annotatingtext.appspot.com/api/adaptor/dictionary3/?term=",
+                    "https://annotatingtext.appspot.com/api/adaptor/dictionary4/?term=",
+                    "https://annotatingtext.appspot.com/api/adaptor/dictionary5/?term="
                 ];
 
 
@@ -322,7 +324,7 @@ app.get('/api/core/definitions', function (req, res){
                 var definition = {
                     "label": resultFromAdaptor.definitions[i].label,
                     "definition": resultFromAdaptor.definitions[i].definition,
-                    "link": "",
+                    "link": resultFromAdaptor.definitions[i].link,
                     "dictionary": resultFromAdaptor.definitions[i].dictionary,
                     "categories": myData[i].data
                 }
