@@ -129,27 +129,28 @@ td, th {
 			  </div>
 			</div>
 		  </form>
-		 
+			<!--
 		  <label class="checkbox-inline">Merriam-Webster
-			<input type="checkbox" id="dic0" value="0">
+			<input type="checkbox" id="dic0" value="0" checked="true">
 			<span class="checking"></span>
-		  </label>
+			</label> -->
+			<label class="checkbox-inline">Bioportal
+				<input type="checkbox" name="dictionary" value="0" checked="true">
+				<span class="checking"></span>
+			</label>
 		  <label class="checkbox-inline">CSIRO-2
-			<input type="checkbox"  id="dic1" value="1">
+			<input type="checkbox" name="dictionary" value="1" checked="true">
 			<span class="checking"></span>
 		  </label>
 		  <label class="checkbox-inline">CSIRO-1
-			<input type="checkbox" id="dic2" value="2">
+			<input type="checkbox" name="dictionary" value="2" checked="true">
 			<span class="checking"></span>
 		  </label>
 		  <label class="checkbox-inline">Urbanup
-			<input type="checkbox" id="dic3" value="3">
+			<input type="checkbox" name="dictionary" value="3" checked="true">
 			<span class="checking"></span>
 		  </label>
-		  <label class="checkbox-inline">Bioportal
-			<input type="checkbox" id="dic4" value="4">
-			<span class="checking"></span>
-		  </label>
+		  
 		
 </div>
 </div>
@@ -204,7 +205,7 @@ td, th {
 
 		/*eslint-env jquery */
 		$( "#btngo" ).click(function() {
-			//alert("click");
+			//console.log('Here is me: ' + getSelectedDictionaries());
 			$("#div_err").hide();
 			$("#div_loading").show();
 			$("#div_result").hide();
@@ -219,7 +220,7 @@ td, th {
 				resultDb = data; // from DB
 				$("#td_selected").show().html(formHtmlDeleteCard(resultDb));
 
-				$.get("/api/core/definitions?searchword=" + searchword, function (dic) {
+				$.get("/api/core/definitions?searchword=" + searchword + "&dic="+getSelectedDictionaries(), function (dic) {
 					$("#div_result").show();
 					$("#div_loading").hide();
 					// alert(dic.error);

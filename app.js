@@ -254,11 +254,12 @@ function analyseInput(searchword){
 
 
 var allAdaptors = [ 
+                    "https://annotatingtext.appspot.com/api/adaptor/dictionary5/?term=",
                     //"https://annotatingtext.appspot.com/api/adaptor/dictionary1/?term=",
                     "https://annotatingtext.appspot.com/api/adaptor/dictionary2/?term=",
                     "https://annotatingtext.appspot.com/api/adaptor/dictionary3/?term=",
-                    "https://annotatingtext.appspot.com/api/adaptor/dictionary4/?term=",
-                    "https://annotatingtext.appspot.com/api/adaptor/dictionary5/?term="
+                    "https://annotatingtext.appspot.com/api/adaptor/dictionary4/?term="
+                    
                 ];
 
 
@@ -276,16 +277,17 @@ async function GetAllCategories(definitions, callback){
     }
 }
 
-const GetDefinitions = async(searchText, callback)=> {
+const GetDefinitions = async(searchText, dictionaries, callback)=> {
     // Get words from fielter
     var words = FilterInput(searchText);
     var requestManyAxios = [];
     for(var i =0; i< allAdaptors.length; i++){
-        
-        for (var j =0; j< words.length; j++){
-
-            requestManyAxios.push(axios.get(allAdaptors[i] + words[j]))
+        if (dictionaries.indexOf(i+';') > -1){
+            for (var j =0; j< words.length; j++){
+                requestManyAxios.push(axios.get(allAdaptors[i] + words[j]))
+            }
         }
+        
     }
     
     try{
@@ -303,8 +305,8 @@ app.get('/api/core/definitions', function (req, res){
         "error": ""
     };
     var searchword = req.query.searchword;
-  
-    GetDefinitions(searchword, function(dataFromAdaptor){
+    var dictionaries = req.query.dic;
+    GetDefinitions(searchword, dictionaries, function(dataFromAdaptor){
         for (var i = 0; i < dataFromAdaptor.length; i++)
         {
             resultFromAdaptor.definitions = concatarray(resultFromAdaptor.definitions, dataFromAdaptor[i].data);

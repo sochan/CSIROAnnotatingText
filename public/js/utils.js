@@ -135,7 +135,6 @@ function createSelectCard(document, id){
                                     +"<span class=\"card-title\"><a rel=\"noopener noreferrer\" target=\"_blank\" href=\""+ document.link+"\">" + document.dictionary + "</a></span>"
                                     +"<p>" + document.definition + "</p>"
                                 +"</div>"
-                                +"<div>Categories: </div>"
                                 +dispayCategories(document.categories)
                                 +"<div class=\"card-action\">"
                                     +"<div id='select_"+id+"'>"+btnSelect+"</div>"
@@ -186,4 +185,16 @@ function formHtmlDeleteCard(data){
         i++;
     });
     return strResult;
+}
+
+function getSelectedDictionaries(){
+    var dictionaries = document.getElementsByName('dictionary');
+    var selectDics = "";
+    for(var i=0; dictionaries[i]; ++i){
+        if(dictionaries[i].checked){
+             selectDics  += dictionaries[i].value + ';';
+        }
+  }
+
+    return selectDics;
 }
