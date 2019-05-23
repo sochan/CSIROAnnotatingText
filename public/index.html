@@ -59,7 +59,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>                        
       </button>
-      <a class="navbar-brand" href="#">Annotator</a>
+      <a class="navbar-brand" href="#">Annotator Text</a>
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
     <ul class="nav navbar-nav navbar-right">
@@ -69,15 +69,8 @@
       <li><a href="#">FEEDBACK</a></li>
     </ul>
 </div>
-
   </div>
 </nav>
-<label class="checkbox-inline"><input type="checkbox" name="box" id="box1" value="1" />Merriam-Webster</label>
-<label class="checkbox-inline"><input type="checkbox" name="box" id="box2" value="2" />CSIRO-2</label>
-<label class="checkbox-inline"><input type="checkbox" name="box" id="box3" value="3" />CSIRO-1</label>
-<label class="checkbox-inline"><input type="checkbox" name="box" id="box2" value="4" />Urbanup</label>
-<label class="checkbox-inline"><input type="checkbox" name="box" id="box3" value="5" />Bioportal</label>
-<br>
 <!-- Navbar ends -->
 <br>
 <div class="container">
@@ -156,115 +149,8 @@
 
 	$(document).ready(function() {
 
- window.addEventListener("beforeunload", function (e) {
-  var confirmationMessage = "\o/";
-
-  (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-  try{
-       var transaction = db.transaction([STORE_NAME], 'readwrite');
-     objectStore = transaction.objectStore(STORE_NAME);
-     var resultDBCloud;
-   if ('getAll' in objectStore) {
-                // IDBObjectStore.getAll() will return the full set of items in our store.
-                objectStore.getAll().onsuccess = function(event) {
-                        var data=event.target.result;
-                        console.log(data);
-                        console.log(resultDb);
-                        //for (var i = 0; i < data.length; i++) {
-                           var i=0;
-                            while (i<data.length) {
-                            var dataID=data[i]._id;
-                            var dataLink=data[i].link;
-                            console.log(data[i].definition);
-                            
-                            $.get("/api/core/readdocument?searchword=" + data[i].label, function (dataCloud) {
-                                        var dataCloud1=dataCloud;
-                                        console.log(dataCloud1);
-                                       var dataLab = JSLINQ(dataCloud1)
-                                        .Where(function(item){ return item.link == dataLink; });
-                                console.log(dataLab.items);
-                                console.log(dataLab.items.length);
-                                //console.log(dataLab.items[0].definition);
-                                       
-                                        if(dataLab.items.length!=0){
-                                             var dataLabDef=dataLab.items[0].definition;
-                                            //if(dataDef==dataLabDef){
-                                                console.log(dataID);
-                                                //console.log(dataLab.items[0]._id);
-                                            if(dataID===undefined){
-                                                console.log("User may delete the definition and then again selected")
-                                            }
-                                            else{
-                                               // $.post("/api/core/adddocument", data[i], function(dataAdd) {
-                                                    console.log("Data Created!!!!");
-                                                //});
-                                            }
-                                        //}
-                                        }
-                                        else{
-                                            if(dataID===undefined){
-                                                 $.post("/api/core/adddocument", data[i], function(dataAdd) {
-                                                    console.log("New data Created");
-                                                });
-                                            }
-                                            else{
-                                            $.post('/api/core/updatedocument',data[i], function(dataAdd) {
-                                             console.log("Data Updated");
-                                                  });
-                                            }
-                                        }
-                            });
-                             setTimeout(i++, 5000)
-                        }
-                }
-   }
-  
-  return confirmationMessage;                            //Webkit, Safari, Chrome
-  }
-  catch( e) {
-      console.log(e);
-  }
-});
-
 		/*eslint-env jquery */
 		$( "#btngo" ).click(function() {
-            var checkboxAll=[];
-            var checkboxLabel=[];
-             var checkValAll = {'dic1':'','dic2':'','dic3':'','dic4':'','dic5':''};
-  		$("input:checkbox[name='box']:checked").each(function(){  
-              console.log( $(this).parent().text().trim());
-              if($(this).parent().text().trim()=='Merriam-Webster'){
-                  checkValAll.dic1=$(this).val(); 
-                  checkboxAll.push($(this).val());
-                  checkboxLabel.push($(this).parent().text().trim());
-              }
-              if($(this).parent().text().trim()=='CSIRO-2'){
-                  checkValAll.dic2=$(this).val();
-                  checkboxAll.push($(this).val()); 
-                  checkboxLabel.push($(this).parent().text().trim());
-              }
-              if($(this).parent().text().trim()=='CSIRO-1'){
-                  checkValAll.dic3=$(this).val(); 
-                  checkboxAll.push($(this).val());
-                  checkboxLabel.push($(this).parent().text().trim());
-              }
-              if($(this).parent().text().trim()=='Urbanup'){
-                  checkValAll.dic4=$(this).val(); 
-                  checkboxAll.push($(this).val());
-                  checkboxLabel.push($(this).parent().text().trim());
-              }
-              if($(this).parent().text().trim()=='Bioportal'){
-                  checkValAll.dic5=$(this).val(); 
-                  checkboxAll.push($(this).val());
-                  checkboxLabel.push($(this).parent().text().trim());
-              }		
-  		});
-  		alert("You have selected: " + checkboxLabel.join(", "));
-          if(checkboxAll=="")
-          {
-              alert("Please select at least one dictionary!");
-          }
-          else {
 			//alert("click");
 			$("#div_err").hide();
 			$("#div_loading").show();
@@ -273,82 +159,14 @@
 			$("#td_results").show().html("");
 			$("#resultnb").html("(0)");
 			var searchword = $("#searchword").val();
-            var params = {'searchword':searchword,'dic1':checkValAll.dic1,'dic2':checkValAll.dic2,'dic3':checkValAll.dic3,'dic4':checkValAll.dic4, 'dic5':checkValAll.dic5};
-            //var params=JSON.parse(params1);
-            var transaction = db.transaction([STORE_NAME], 'readwrite');
-              objectStore = transaction.objectStore(STORE_NAME);
 
-            if ('getAll' in objectStore) {
-                // IDBObjectStore.getAll() will return the full set of items in our store.
-                objectStore.getAll().onsuccess = function(event) {
-                     
-                        var data=event.target.result;
-                        var data = JSLINQ(event.target.result)
-                   .Where(function(item){ return item.label == searchword; })
-                        console.log(data.items);
-                        console.log(event.target.result);
-                  if(data.items.length>0){
-                      
-                           $("#td_selected").show().html("");
-				            $("#td_selected").show().html(formHtmlDeleteCard(data.items));
-                  
-                          // $.get("/api/core/readdocument?searchword=" + searchword, function (data) {
-				/* Get definitions from Cached DB */
-				//$("#td_selected").show().html("");
-				resultDb = data.items; // from DB
-				//$("#td_selected").show().html(formHtmlDeleteCard(resultDb));
-           // });
-           
-                 ///
-				$.post("/api/core/connectonlinedictionary", params, function (dic) {
-					$("#div_result").show();
-					$("#div_loading").hide();
-					// alert(dic.error);
-					if (dic.error != "")
-					{
-						$("#div_err").show();
-						$("#error_msg").html(dic.error);
-					}else{
-						result = dic.definitions; // set to global
-						$("#resultnb").html("(" +result.length+ ")");
-						$("#td_results").show().html(formHtmlSelectCard(result));
-					}
-				});		
-		//});
-                       
-                  }
-                  else{
-                // Fallback to the traditional cursor approach if getAll isn't supported.
-            $.get("/api/core/readdocument?searchword="+searchword, function (data) {
+			$.get("/api/core/readdocument?searchword=" + searchword, function (data) {
 				/* Get definitions from Cached DB */
 				$("#td_selected").show().html("");
-				//resultDb = data; // from DB
-				$("#td_selected").show().html(formHtmlDeleteCard(data));
-           // });
-           
-            var transaction = db.transaction([STORE_NAME], 'readwrite');
-             objectStore =  transaction.objectStore(STORE_NAME);
-             console.log(objectStore);
-            for (var i=0; i< data.length; i++){
-                    objectStore.put(data[i]).onsuccess = function() {
-                console.log('Added vocabulary to IndexedDB from cloudantDB.');
-                    }; 
-            }
-            if ('getAll' in objectStore) {
-                // IDBObjectStore.getAll() will return the full set of items in our store.
-                objectStore.getAll().onsuccess = function(event) {
-                     
-                        var data=event.target.result;
-                        var data = JSLINQ(event.target.result)
-                                    .Where(function(item){ return item.label == searchword; })
-                        resultDb=data.items;
-                        console.log("Data from indexedDB");
-                        console.log(data.items);
-                    }              
-                }
-            
-                 ///
-				$.post("/api/core/connectonlinedictionary",  params, function (dic) {
+				resultDb = data; // from DB
+				$("#td_selected").show().html(formHtmlDeleteCard(resultDb));
+
+				$.get("/api/core/definitions?searchword=" + searchword, function (dic) {
 					$("#div_result").show();
 					$("#div_loading").hide();
 					// alert(dic.error);
@@ -357,19 +175,20 @@
 						$("#div_err").show();
 						$("#error_msg").html(dic.error);
 					}else{
-						result = dic.definitions; // set to global
-						$("#resultnb").html("(" +result.length+ ")");
+						//
+						$("#resultnb").html("(" +dic.definitions.length + ")");
+						$("#td_results").show().html(formHtmlSelectCard(dic.definitions));
+						result = dic.definitions;
+						$("#resultnb").html("(" + result.length + ")");
 						$("#td_results").show().html(formHtmlSelectCard(result));
+
 					}
-				});		
+				});
+			});
+
 		});
-       }
-                    
-                };
-            } 
-          }
-    });
-    
+
+
 		// Get the input field
 		var input = document.getElementById("searchword");
 
@@ -386,5 +205,5 @@
 	});
 </script>
 <script src="js/autocomplete.js"></script>
-<script src="js/JSLINQ.js"></script>
+
 </body></html>
