@@ -300,12 +300,14 @@ const GetDefinitions = async(searchText, dictionaries, callback)=> {
 
 
 app.get('/api/core/definitions', function (req, res){
+    var searchword = req.query.searchword;
+    var dictionaries = req.query.dic;
+
     var resultFromAdaptor = {
         "definitions": [],
         "error": ""
     };
-    var searchword = req.query.searchword;
-    var dictionaries = req.query.dic;
+    
     GetDefinitions(searchword, dictionaries, function(dataFromAdaptor){
         for (var i = 0; i < dataFromAdaptor.length; i++)
         {
@@ -314,9 +316,10 @@ app.get('/api/core/definitions', function (req, res){
 
         GetAllCategories(resultFromAdaptor.definitions, function(myData){
 
-            console.log("nbDef: " + resultFromAdaptor.definitions.length + "; Nb cat: " + myData.length);
+            //console.log("nbDef: " + resultFromAdaptor.definitions.length + "; Nb cat: " + myData.length);
             var newResultFromAdaptor = {
                 "definitions": [],
+                "keywords" : FilterInput(searchword),
                 "error": ""
             };
             
@@ -450,7 +453,7 @@ const GetCategories = async(definition, callback)=>{
         'text': definition,
         'features': {
           'categories': {
-            'limit': 1,
+            'limit': 3,
           },
         },
       };

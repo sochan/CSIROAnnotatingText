@@ -106,7 +106,9 @@ function formHtmlDelete(data){
     
     data.forEach(word => {
         i++;
-        strResult += "<tr><td>" + i + ") " + word.definition + "<br> Source: <a href='"+ word.link +"'>" + word.dictionary + "</a>"  + "</td><td><button onclick=\"javascript:deleteOneDefinition('"+(i-1)+"');\" style=\"float: right;\">Delete</button></td></tr>";
+        strResult += "<tr><td>" + i + ") " + word.definition + "<br> Source: <a href='"+ word.link +"'>" 
+        + word.dictionary + "</a>"  + "</td><td><button onclick=\"javascript:deleteOneDefinition('"+(i-1)
+        + "');\" style=\"float: right;\">Delete</button></td></tr>";
     });
     strResult += "</tbody></table>"
     return strResult;
@@ -116,7 +118,11 @@ function dispayCategories(categories){
     //console.log(categories);
     var str = "";
     for(var i =0; i < categories.length; i++){
-        str += "<div>"+categories[i].label + "("+categories[i].score+")" +"</div>";
+        str += "<div title='Matching category and score from IBM Natural Language Understanding.'>"+categories[i].label 
+        + "<span>" 
+            + " (" + categories[i].score +")"
+        + "</span></div>";
+       
     }
     return str;
 }
@@ -129,19 +135,23 @@ function createSelectCard(document, id){
     if (alreadySave)
         btnSelect = "";
     var strResult =  "<div class=\"row\">"
-                        +"<div class=\"col s12 m15\">"
-                            +"<div class=\"card blue-grey darken-1\">"
-                                +"<div class=\"card-content white-text\">"
-                                    +"<span class=\"card-title\"><a rel=\"noopener noreferrer\" target=\"_blank\" href=\""+ document.link+"\">" + document.dictionary + "</a></span>"
-                                    +"<p>" + document.definition + "</p>"
-                                +"</div>"
-                                +dispayCategories(document.categories)
-                                +"<div class=\"card-action\">"
-                                    +"<div id='select_"+id+"'>"+btnSelect+"</div>"
-                                +"</div>"
-                            +"</div>"
-                        +"</div>"
-                    +"</div>";
+                        + "<div class=\"col s12 m15\">"
+                            + "<div class=\"card blue-grey darken-1\">"
+                                + "<div class=\"card-content white-text\">"
+                                    + "<span class=\"card-title\"><a rel=\"noopener noreferrer\" target=\"_blank\" href=\""+ document.link+"\">" + document.label + "</a></span>"
+                                    + "<p>" + document.definition + "</p>"
+                                + "</div>"
+                                + "<div>"
+                                + "Original source: <a rel=\"noopener noreferrer\" target=\"_blank\" href=\""+ document.link+"\">" + document.dictionary + "</a>"
+                                + "</div>"
+                                + "<div>Categories:</div>" 
+                                + dispayCategories(document.categories)
+                                + "<div class=\"card-action\">"
+                                    + "<div id='select_"+id+"'>" + btnSelect + "</div>"
+                                + "</div>"
+                            + "</div>"
+                        + "</div>"
+                    + "</div>";
     return strResult;
 }
 
@@ -165,8 +175,11 @@ function createDeleteCard(document, id){
                         +"<div class=\"col s12 m15\">"
                             +"<div class=\"card blue-grey darken-1\">"
                                 +"<div class=\"card-content white-text\">"
-                                    +"<span class=\"card-title\"><a rel=\"noopener noreferrer\" target=\"_blank\" href=\""+ document.link+"\">" + document.dictionary + "</a></span>"
+                                    +"<span class=\"card-title\"><a rel=\"noopener noreferrer\" target=\"_blank\" href=\""+ document.link+"\">" + document.label + "</a></span>"
                                     +"<p>" + document.definition + "</p>"
+                                +"</div>"
+                                +"<div>"
+                                + "Dictionary: " + document.dictionary
                                 +"</div>"
                                 +"<div class=\"card-action\">"
                                     +"<div id='select_"+id+"'>"+btnSelect+"</div>"
@@ -192,9 +205,73 @@ function getSelectedDictionaries(){
     var selectDics = "";
     for(var i=0; dictionaries[i]; ++i){
         if(dictionaries[i].checked){
-             selectDics  += dictionaries[i].value + ';';
+             selectDics  += dictionaries[i].value + ";";
         }
   }
 
     return selectDics;
+}
+
+// https://stackoverflow.com/questions/8644428/how-to-highlight-text-using-javascript
+function highlight(word, definition, controlId) {
+    var inputText = document.getElementById(controlId);
+    var innerHTML = inputText.innerHTML;
+    var index = innerHTML.indexOf(word);
+    if (index >= 0) { 
+        innerHTML = innerHTML.substring(0,index) 
+        + "<span name='mykeyword' title='"+definition+"' class='highlight'>" 
+        + innerHTML.substring(index,index+word.length) + "</span>" 
+        + innerHTML.substring(index + word.length);
+        inputText.innerHTML = innerHTML;
+    }
+  }
+
+// get list of best definitions related to each keyword
+function getBestMatchDefinition(dataFromIBM){
+    var result = [];
+    var keywords = dataFromIBM.keywords;
+    // loop in dataFromIBM
+    for(var i=0; i < keywords.length; i++){
+        var word = keywords[i];
+        
+        // get array
+        var tempArray = cleanOneKeyword(word, dataFromIBM);
+
+        // get max score
+        var maxScore = Math.max.apply(Math, tempArray.map(function(o) { return o.score; }));
+
+        // get definition
+        var bestDefinition = tempArray.find(function(o){ return o.score == maxScore; })
+        result.push(bestDefinition);
+    }
+
+    return result;
+}
+
+// Clean array for one keyword;
+// After getting all definitions for one word, we can get one definition that has the highest score
+function cleanOneKeyword(word, dataFromIBM){
+    var arrayOneWord =[];
+    dataFromIBM.definitions.forEach(def => {
+        var oneDefinition = {
+            "label": word,
+            "definition": "",
+            "link": "",
+            "dictionary": "",
+            "category": "",
+            "score": 0
+        }
+        if (def.label == word && def.categories.length>0){
+            oneDefinition.definition = def.definition;
+            oneDefinition.link = def.link;
+            oneDefinition.dictionary = def.dictionary;
+            oneDefinition.category = def.categories[0].label;
+            oneDefinition.score = def.categories[0].score;
+
+            arrayOneWord.push(oneDefinition);
+
+        }
+            
+    });
+    return arrayOneWord;
 }
