@@ -227,6 +227,8 @@ function highlight(word, definition, controlId) {
   }
 
 // get list of best definitions related to each keyword
+// https://stackoverflow.com/questions/4020796/finding-the-max-value-of-an-attribute-in-an-array-of-objects
+// 
 function getBestMatchDefinition(dataFromIBM){
     var result = [];
     var keywords = dataFromIBM.keywords;

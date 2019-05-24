@@ -4,6 +4,8 @@
 <head>
 	<title>ANNOTATOR</title>
 
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -23,6 +25,9 @@
 
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
+		.highlight {
+			background-color: yellow;
+		}
 	.loader {
 		position: absolute;
 	  border: 16px solid #f3f3f3;
@@ -90,6 +95,7 @@ td, th {
     max-width: 1280px;
     width: 90%;
 }
+
 	</style>
 </head>
 <body>
@@ -174,6 +180,17 @@ td, th {
 		
 	</div>
 </div>
+
+
+
+<div class="container">
+		<div class="row">
+				<div id="inputText"></div>
+		</div>
+</div>
+
+
+
 <div class="container" id="div_result">
 	<div class="row">
 		<div class="col-md-1"></div>
@@ -236,6 +253,13 @@ td, th {
 						$("#resultnb").html("(" + result.length + ")");
 						$("#td_results").show().html(formHtmlSelectCard(result));
 
+						$("#inputText").text(searchword);
+
+						var bestDefinitions = getBestMatchDefinition(dic);
+						// Start highlight
+						for (var i = 0; i < dic.keywords.length; i++){
+							highlight(dic.keywords[i],bestDefinitions[i].definition, "inputText");
+						}
 					}
 				});
 			});
@@ -260,4 +284,5 @@ td, th {
 </script>
 <script src="js/autocomplete.js"></script>
 
-</body></html>
+</body>
+</html>
