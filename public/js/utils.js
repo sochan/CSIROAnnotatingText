@@ -277,3 +277,12 @@ function cleanOneKeyword(word, dataFromIBM){
     });
     return arrayOneWord;
 }
+
+// this will return a string of best match definition for a keyword
+function getOneBestDefinition(arrayBestDefinitions, word){
+
+    var result = arrayBestDefinitions.find(function(o){ return o.label == word; });
+    if (result != null)
+        return result.definition
+    else return 'Not found';
+}

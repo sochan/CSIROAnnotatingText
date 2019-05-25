@@ -256,9 +256,10 @@ td, th {
 						$("#inputText").text(searchword);
 
 						var bestDefinitions = getBestMatchDefinition(dic);
-						// Start highlight
+						// Start highlight and tooltips
 						for (var i = 0; i < dic.keywords.length; i++){
-							highlight(dic.keywords[i],bestDefinitions[i].definition, "inputText");
+							var oneBestDef = getOneBestDefinition(bestDefinitions, dic.keywords[i]);
+							highlight(dic.keywords[i], oneBestDef, "inputText");
 						}
 					}
 				});
