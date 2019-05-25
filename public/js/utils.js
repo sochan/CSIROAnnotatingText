@@ -238,13 +238,13 @@ function getBestMatchDefinition(dataFromIBM){
         
         // get array
         var tempArray = cleanOneKeyword(word, dataFromIBM);
-
-        // get max score
-        var maxScore = Math.max.apply(Math, tempArray.map(function(o) { return o.score; }));
-
-        // get definition
-        var bestDefinition = tempArray.find(function(o){ return o.score == maxScore; })
-        result.push(bestDefinition);
+        if (tempArray.length > 0){
+            // get max score
+            var maxScore = Math.max.apply(Math, tempArray.map(function(o) { return o.score; }));
+            // get definition
+            var bestDefinition = tempArray.find(function(o){ return o.score == maxScore; })
+            result.push(bestDefinition);
+        }
     }
 
     return result;
@@ -280,7 +280,6 @@ function cleanOneKeyword(word, dataFromIBM){
 
 // this will return a string of best match definition for a keyword
 function getOneBestDefinition(arrayBestDefinitions, word){
-
     var result = arrayBestDefinitions.find(function(o){ return o.label == word; });
     if (result != null)
         return result.definition
