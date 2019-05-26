@@ -231,12 +231,13 @@ td, th {
 			$("#resultnb").html("(0)");
 			var searchword = $("#searchword").val();
 
-			$.get("/api/core/readdocument?searchword=" + searchword, function (data) {
-				/* Get definitions from Cached DB */
+			$.get("/api/core/documentkeywords?searchword=" + searchword, function (data) {
+				/* Get selected definitions */
 				$("#td_selected").show().html("");
-				resultDb = data; // from DB
-				$("#td_selected").show().html(formHtmlDeleteCard(resultDb));
+				resultSelected = data; // from DB
+				$("#td_selected").show().html(formHtmlDeleteCard(resultSelected));
 
+				/* Get definitions from adaptors */
 				$.get("/api/core/definitions?searchword=" + searchword + "&dic="+getSelectedDictionaries(), function (dic) {
 					$("#div_result").show();
 					$("#div_loading").hide();
@@ -246,10 +247,11 @@ td, th {
 						$("#div_err").show();
 						$("#error_msg").html(dic.error);
 					}else{
-						//
-						$("#resultnb").html("(" +dic.definitions.length + ")");
-						$("#td_results").show().html(formHtmlSelectCard(dic.definitions));
 						result = dic.definitions;
+						//console.log(result);
+						$("#resultnb").html("(" +result.length + ")");
+						$("#td_results").show().html(formHtmlSelectCard(result));
+						
 						$("#resultnb").html("(" + result.length + ")");
 						$("#td_results").show().html(formHtmlSelectCard(result));
 
