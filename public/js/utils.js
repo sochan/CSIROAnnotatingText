@@ -1,10 +1,10 @@
 var result;
-var resultDb;
+var resultSelected;
 //
 function alreadySelected(definition){
     var existed = false;
 
-    resultDb.forEach(element => {
+    resultSelected.forEach(element => {
 
         if (element.definition === definition)
         {
@@ -33,22 +33,43 @@ function selectOneDefinition(docId) {
     $("#div_loading").show();
     $("#td_selected").show().html("");
     var selectedDocument = result[docId];
-    selectedDocument.deleted = "0";
     
+    selectedDocument.deleted = "0";
+   
+    var paramToPost = JSON.stringify(selectedDocument, null, 2);
+
+    console.log(paramToPost);
+
+    $.ajax({
+        url:"/api/core/adddocument",
+        type:"POST",
+        data:paramToPost,
+        contentType:"application/json; charset=utf-8",
+        dataType:"json",
+        success: function(){
+            var searchword = $("#searchword").val();
+            $.get("/api/core/documentkeywords?searchword=" + searchword, function (data) {
+                $("#div_loading").hide();
+                $("#td_selected").show().html("");
+                resultSelected = data; // from DB
+                $("#td_selected").show().html(formHtmlDeleteCard(resultSelected));
+            });
+        }
+      })
+
+    /*
     // insert
-    $.post("/api/core/adddocument", selectedDocument, function (dataAdd) {
+    $.post("/api/core/adddocument", paramToPost, function (dataAdd) {
 
-        //var searchword = $("#searchword").val();
-        var searchword = selectedDocument.definition.label;
-        $.get("/api/core/readdocument?searchword=" + searchword, function (data) {
-
-
+        var searchword = $("#searchword").val();
+        $.get("/api/core/documentkeywords?searchword=" + searchword, function (data) {
             $("#div_loading").hide();
             $("#td_selected").show().html("");
-            resultDb = data; // from DB
-            $("#td_selected").show().html(formHtmlDeleteCard(resultDb));
+            resultSelected = data; // from DB
+            $("#td_selected").show().html(formHtmlDeleteCard(resultSelected));
         });
     });
+    */
 
     $("#select_"+ docId).html("");// Hide button
 }
@@ -58,20 +79,19 @@ function deleteOneDefinition(docId) {
     
     $("#div_loading").show();
     $("#td_selected").show().html("");
-    var deletedDocument = resultDb[docId];
+    var deletedDocument = resultSelected[docId];
     deletedDocument.deleted = "1";
     
-    //console.log(resultDb);
+    //console.log(resultSelected);
     // update
     $.post("/api/core/updatedocument", deletedDocument , function (data) {
-        //var searchword = $("#searchword").val();
-        var searchword = deletedDocument.definition.label;
-        $.get("/api/core/readdocument?searchword=" + searchword, function (readdata) {
+        var searchword = $("#searchword").val();
+        $.get("/api/core/documentkeywords?searchword=" + searchword, function (readdata) {
             $("#div_loading").hide();
             /* Get definitions from Cached DB */
             $("#td_selected").show().html("");
-            resultDb = readdata; // from DB
-            $("#td_selected").show().html(formHtmlDeleteCard(resultDb));
+            resultSelected = readdata; // from DB
+            $("#td_selected").show().html(formHtmlDeleteCard(resultSelected));
 
             // dispay select button
             var deleteId = lookingDefinitionIdInOnline(deletedDocument.definition);
@@ -169,6 +189,8 @@ function formHtmlSelectCard(data){
 
 function createDeleteCard(document, id){
 
+    //console.log(document);
+
     var btnSelect = "<a href=\"javascript:deleteOneDefinition('"+id+"');\">DELETE</a>";
 
     var strResult =  "<div class=\"row\">"
@@ -178,9 +200,11 @@ function createDeleteCard(document, id){
                                     +"<span class=\"card-title\"><a rel=\"noopener noreferrer\" target=\"_blank\" href=\""+ document.link+"\">" + document.label + "</a></span>"
                                     +"<p>" + document.definition + "</p>"
                                 +"</div>"
-                                +"<div>"
-                                + "Dictionary: " + document.dictionary
-                                +"</div>"
+                                + "<div>"
+                                + "Original source: <a rel=\"noopener noreferrer\" target=\"_blank\" href=\""+ document.link+"\">" + document.dictionary + "</a>"
+                                + "</div>"
+                                + "<div>Categories:</div>" 
+                                + dispayCategories(document.categories)
                                 +"<div class=\"card-action\">"
                                     +"<div id='select_"+id+"'>"+btnSelect+"</div>"
                                 +"</div>"
@@ -230,7 +254,7 @@ function highlight(word, definition, controlId) {
 // https://stackoverflow.com/questions/4020796/finding-the-max-value-of-an-attribute-in-an-array-of-objects
 // 
 function getBestMatchDefinition(dataFromIBM){
-    var result = [];
+    var bestDefList = [];
     var keywords = dataFromIBM.keywords;
     // loop in dataFromIBM
     for(var i=0; i < keywords.length; i++){
@@ -243,11 +267,11 @@ function getBestMatchDefinition(dataFromIBM){
             var maxScore = Math.max.apply(Math, tempArray.map(function(o) { return o.score; }));
             // get definition
             var bestDefinition = tempArray.find(function(o){ return o.score == maxScore; })
-            result.push(bestDefinition);
+            bestDefList.push(bestDefinition);
         }
     }
 
-    return result;
+    return bestDefList;
 }
 
 // Clean array for one keyword;
@@ -280,8 +304,8 @@ function cleanOneKeyword(word, dataFromIBM){
 
 // this will return a string of best match definition for a keyword
 function getOneBestDefinition(arrayBestDefinitions, word){
-    var result = arrayBestDefinitions.find(function(o){ return o.label == word; });
-    if (result != null)
-        return result.definition
+    var bestDef = arrayBestDefinitions.find(function(o){ return o.label == word; });
+    if (bestDef != null)
+        return bestDef.definition
     else return 'Not found';
 }

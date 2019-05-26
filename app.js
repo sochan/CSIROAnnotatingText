@@ -171,7 +171,8 @@ function createDocument(document, callback) {
         "definition": document.definition,
         "dictionary": document.dictionary,
         "deleted": document.deleted,
-        "link": document.link
+        "link": document.link,
+        "categories": document.categories
     }, function (err, data) {
         callback(data);
     });
@@ -186,10 +187,6 @@ app.post('/api/core/adddocument/', function (req, res) {
     });
 });
 
-function readLabels(callback){
-
-}
-
 // read/search word, seleted, not deleted
 function readDocument(word, callback) {
     var searchWord = word.toLowerCase();//correctSearchWord(word);
@@ -201,6 +198,37 @@ function readDocument(word, callback) {
 
 app.get('/api/core/readdocument', function (req, res) {
     var result = readDocument(req.query.searchword, function (data) { //req.body.searchword
+            res.setHeader('Content-Type', 'application/json');
+            res.send(data["docs"]);
+            res.end();
+        }
+    );
+});
+
+// Read documents with many keywords; FilterInput
+function readDocumentMultipleKeyword(word, callback) {
+    var searchWord = word.toLowerCase();//correctSearchWord(word);
+
+    var keywords = FilterInput(searchWord);
+    var labelOr = [];
+    for(var i = 0; i< keywords.length; i++){
+        labelOr.push({"label": keywords[i]})
+    }
+
+    var query = {
+            selector: {
+                deleted:"0",
+                "$or": labelOr
+            }
+        };
+
+    db.find(query, function (err, data) {
+        callback(data);
+    });
+}
+
+app.get('/api/core/documentkeywords', function (req, res) {
+    var result = readDocumentMultipleKeyword(req.query.searchword, function (data) { //req.body.searchword
             res.setHeader('Content-Type', 'application/json');
             res.send(data["docs"]);
             res.end();
