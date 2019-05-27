@@ -55,21 +55,7 @@ function selectOneDefinition(docId) {
                 $("#td_selected").show().html(formHtmlDeleteCard(resultSelected));
             });
         }
-      })
-
-    /*
-    // insert
-    $.post("/api/core/adddocument", paramToPost, function (dataAdd) {
-
-        var searchword = $("#searchword").val();
-        $.get("/api/core/documentkeywords?searchword=" + searchword, function (data) {
-            $("#div_loading").hide();
-            $("#td_selected").show().html("");
-            resultSelected = data; // from DB
-            $("#td_selected").show().html(formHtmlDeleteCard(resultSelected));
-        });
-    });
-    */
+      });
 
     $("#select_"+ docId).html("");// Hide button
 }
@@ -191,7 +177,7 @@ function createDeleteCard(document, id){
 
     //console.log(document);
 
-    var btnSelect = "<a href=\"javascript:deleteOneDefinition('"+id+"');\">DELETE</a>";
+    var btnDelete = "<a href=\"javascript:deleteOneDefinition('"+id+"');\">DELETE</a>";
 
     var strResult =  "<div class=\"row\">"
                         +"<div class=\"col s12 m15\">"
@@ -206,7 +192,7 @@ function createDeleteCard(document, id){
                                 + "<div>Categories:</div>" 
                                 + dispayCategories(document.categories)
                                 +"<div class=\"card-action\">"
-                                    +"<div id='select_"+id+"'>"+btnSelect+"</div>"
+                                    +"<div id='delete_"+id+"'>"+btnDelete+"</div>"
                                 +"</div>"
                             +"</div>"
                         +"</div>"
